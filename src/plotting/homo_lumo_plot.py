@@ -10,6 +10,7 @@ from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 
 from src.data.models import CompoundHomoLumo
+from src.plotting.plot_helpers import apply_axes_decorations, apply_x_ticks
 from src.plotting.style_presets import DEFAULT_STYLE, DiagramStyle
 
 logger = logging.getLogger(__name__)
@@ -69,7 +70,7 @@ class HomoLumoPlotter:
                 ha="center", va="center",
                 fontsize=14, color="#888888",
             )
-            self._apply_figure_style(ax, style)
+            apply_axes_decorations(ax, style)
             return {}
 
         artists: dict[str, list[Any]] = {
@@ -90,7 +91,6 @@ class HomoLumoPlotter:
             self._draw_compound(ax, i, compound, homo_s, lumo_s, gap_s, lbl_s, artists)
 
         self._apply_axes_style(ax, compounds, style)
-        self._apply_figure_style(ax, style)
         self._apply_legend(ax, homo_s, lumo_s, style["legend"])
 
         return artists
@@ -208,18 +208,8 @@ class HomoLumoPlotter:
         compounds: list[CompoundHomoLumo],
         style: DiagramStyle,
     ) -> None:
-        axes_s = style["axes"]
-        lbl_s = style["compound_labels"]
-
         # X ticks and compound name labels
-        ax.set_xticks(list(range(len(compounds))))
-        ax.set_xticklabels(
-            [c.name for c in compounds],
-            fontsize=lbl_s["fontsize"],
-            fontfamily=lbl_s["fontfamily"],
-            rotation=lbl_s["rotation"],
-            ha="center",
-        )
+        apply_x_ticks(ax, [c.name for c in compounds], style)
 
         # Y-axis limits with 15% margin so value annotations fit
         all_y = [c.homo for c in compounds] + [c.lumo for c in compounds]
@@ -227,53 +217,8 @@ class HomoLumoPlotter:
         margin = max(y_range * 0.15, 0.5)
         ax.set_ylim(min(all_y) - margin, max(all_y) + margin)
 
-        # X limits with half-unit padding on each side
-        ax.set_xlim(-0.5, len(compounds) - 0.5)
-
-        # Axis labels
-        ax.set_ylabel(
-            axes_s["ylabel"],
-            fontsize=axes_s["label_fontsize"],
-            fontfamily=axes_s["label_fontfamily"],
-        )
-        if axes_s["xlabel"]:
-            ax.set_xlabel(
-                axes_s["xlabel"],
-                fontsize=axes_s["label_fontsize"],
-                fontfamily=axes_s["label_fontfamily"],
-            )
-
-        # Tick font sizes
-        ax.tick_params(axis="both", labelsize=axes_s["tick_fontsize"])
-
-        # Spine linewidths
-        for spine in ax.spines.values():
-            spine.set_linewidth(axes_s["spine_linewidth"])
-
-        # Grid — styling kwargs must NOT be passed when turning the grid off;
-        # matplotlib treats any kwargs as implicit visible=True and warns.
-        if axes_s["show_grid"]:
-            ax.grid(True, axis="y", alpha=axes_s["grid_alpha"], linestyle="--", color="#cccccc")
-            ax.set_axisbelow(True)
-        else:
-            ax.grid(False)
-
-        # Title
-        title_s = style["title"]
-        if title_s["visible"]:
-            ax.set_title(
-                title_s["text"],
-                fontsize=title_s["fontsize"],
-                fontfamily=title_s["fontfamily"],
-                fontweight=title_s["fontweight"],
-                color=title_s["color"],
-            )
-
-    def _apply_figure_style(self, ax: Axes, style: DiagramStyle) -> None:
-        bg = style["figure"]["background_color"]
-        ax.set_facecolor(bg)
-        if ax.figure is not None:
-            ax.figure.set_facecolor(bg)
+        # Apply all other axis decorations (labels, grid, spines, title, bg)
+        apply_axes_decorations(ax, style)
 
     def _apply_legend(
         self,

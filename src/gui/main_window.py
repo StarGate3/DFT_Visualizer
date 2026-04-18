@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import (
 
 from src.gui.data_panel import DataPanel
 from src.gui.diagram_widgets.homo_lumo_diagram import HomoLumoDiagramWidget
+from src.gui.diagram_widgets.state_diagram import StateDiagramWidget
 from src.gui.style_panel import StylePanel
 
 logger = logging.getLogger(__name__)
@@ -182,7 +183,8 @@ class MainWindow(QMainWindow):
         """Create the three-tab central diagram area.
 
         Tab 0 hosts the live HomoLumoDiagramWidget.
-        Tabs 1–2 remain placeholders until Stages 4 and 5.
+        Tab 1 hosts the live StateDiagramWidget.
+        Tab 2 remains a placeholder until Stage 5.
         """
         self._tab_widget = QTabWidget(self)
         self.setCentralWidget(self._tab_widget)
@@ -190,13 +192,13 @@ class MainWindow(QMainWindow):
         self._homo_lumo_widget = HomoLumoDiagramWidget(self)
         self._tab_widget.addTab(self._homo_lumo_widget, "HOMO/LUMO")
 
-        for tab_title, placeholder_text in [
-            ("S0/S1/T1 States", "State diagram will appear here"),
-            ("Franck-Condon", "Franck-Condon diagram will appear here"),
-        ]:
-            self._tab_widget.addTab(
-                self._make_placeholder_label(placeholder_text), tab_title
-            )
+        self._state_diagram_widget = StateDiagramWidget(self)
+        self._tab_widget.addTab(self._state_diagram_widget, "S0/S1/T1 States")
+
+        self._tab_widget.addTab(
+            self._make_placeholder_label("Franck-Condon diagram will appear here"),
+            "Franck-Condon",
+        )
 
     def _make_placeholder_label(self, text: str) -> QLabel:
         """Return a centered, styled placeholder QLabel for an empty tab."""
@@ -244,9 +246,7 @@ class MainWindow(QMainWindow):
         self._data_panel.data_changed.connect(self.refresh_active_diagram)
         self._data_panel.dataset_loaded.connect(self.refresh_active_diagram)
         self._style_panel.style_changed.connect(self.refresh_active_diagram)
-        self._tab_widget.currentChanged.connect(
-            lambda _: self.refresh_active_diagram()
-        )
+        self._tab_widget.currentChanged.connect(self._on_tab_changed)
 
         # Wire View menu toggles
         self._toggle_data_action.toggled.connect(self._data_dock.setVisible)
@@ -287,12 +287,17 @@ class MainWindow(QMainWindow):
             f"{n_st} states, {n_fc} FC entries"
         )
 
+    def _on_tab_changed(self, idx: int) -> None:
+        """Handle tab change: update style panel sections and refresh diagram."""
+        self._style_panel.set_active_tab(idx)
+        self.refresh_active_diagram()
+
     def refresh_active_diagram(self) -> None:
         """Re-render whichever diagram tab is currently visible.
 
         Fetches the current dataset and style, then calls refresh() on the
-        appropriate diagram widget.  Tabs 1 and 2 are placeholders and do
-        nothing until Stages 4 and 5.
+        appropriate diagram widget.  Tab 2 is a placeholder and does
+        nothing until Stage 5.
         """
         dataset = self._data_panel.get_dataset()
         style = self._style_panel.get_style()
@@ -300,6 +305,8 @@ class MainWindow(QMainWindow):
         logger.debug("refresh_active_diagram: tab=%d", idx)
         if idx == 0:
             self._homo_lumo_widget.refresh(dataset, style)
+        elif idx == 1:
+            self._state_diagram_widget.refresh(dataset, style)
 
     # ------------------------------------------------------------------
     # Stub handler

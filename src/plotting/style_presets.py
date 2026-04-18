@@ -69,6 +69,41 @@ class LegendStyle(TypedDict):
     frameon: bool
 
 
+class StateLevelStyle(TypedDict):
+    """Style for S0, S1, or T1 horizontal energy-level line."""
+    color: str
+    linewidth: float
+    value_fontsize: int
+    value_color: str
+    value_format: str
+    value_offset_points: int
+    label_text: str
+    label_fontsize: int
+    label_fontweight: str
+    label_color: str
+
+
+class AbsorptionArrowStyle(TypedDict):
+    color: str
+    linewidth: float
+    arrow_style: str
+    label_text: str
+    label_fontsize: int
+    label_color: str
+    show_label: bool
+
+
+class IscCurveStyle(TypedDict):
+    color: str
+    linewidth: float
+    linestyle: str
+    label_text: str
+    label_fontsize: int
+    label_color: str
+    show_label: bool
+    curvature: float
+
+
 class DiagramStyle(TypedDict):
     figure: FigureStyle
     title: TitleStyle
@@ -78,6 +113,11 @@ class DiagramStyle(TypedDict):
     gap_arrow: GapArrowStyle
     compound_labels: CompoundLabelsStyle
     legend: LegendStyle
+    s0: StateLevelStyle
+    s1: StateLevelStyle
+    t1: StateLevelStyle
+    absorption_arrow: AbsorptionArrowStyle
+    isc_curve: IscCurveStyle
 
 
 # ---------------------------------------------------------------------------
@@ -144,6 +184,11 @@ DEFAULT_STYLE: DiagramStyle = {
         "fontsize": 9,
         "frameon": True,
     },
+    "s0": {"color": "#1F2E5C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#1F2E5C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#1F2E5C"},
+    "s1": {"color": "#8B2E3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#8B2E3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#8B2E3C"},
+    "t1": {"color": "#2E6B3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#2E6B3C"},
+    "absorption_arrow": {"color": "#333333", "linewidth": 1.5, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 9, "label_color": "#333333", "show_label": True},
+    "isc_curve": {"color": "#555555", "linewidth": 1.2, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 9, "label_color": "#555555", "show_label": True, "curvature": 0.3},
 }
 
 PUBLICATION_STYLE: DiagramStyle = {
@@ -206,6 +251,11 @@ PUBLICATION_STYLE: DiagramStyle = {
         "fontsize": 8,
         "frameon": False,
     },
+    "s0": {"color": "#1F2E5C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#1F2E5C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#1F2E5C"},
+    "s1": {"color": "#8B2E3C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#8B2E3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#8B2E3C"},
+    "t1": {"color": "#2E6B3C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#2E6B3C"},
+    "absorption_arrow": {"color": "#333333", "linewidth": 1.0, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 8, "label_color": "#333333", "show_label": True},
+    "isc_curve": {"color": "#555555", "linewidth": 0.75, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 8, "label_color": "#555555", "show_label": True, "curvature": 0.3},
 }
 
 # Okabe-Ito colorblind-safe palette
@@ -269,6 +319,11 @@ COLORBLIND_STYLE: DiagramStyle = {
         "fontsize": 9,
         "frameon": True,
     },
+    "s0": {"color": "#0072B2", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#0072B2", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#0072B2"},
+    "s1": {"color": "#D55E00", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#D55E00", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#D55E00"},
+    "t1": {"color": "#009E73", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#009E73", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#009E73"},
+    "absorption_arrow": {"color": "#333333", "linewidth": 1.5, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 9, "label_color": "#333333", "show_label": True},
+    "isc_curve": {"color": "#555555", "linewidth": 1.2, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 9, "label_color": "#555555", "show_label": True, "curvature": 0.3},
 }
 
 GRAYSCALE_STYLE: DiagramStyle = {
@@ -331,6 +386,11 @@ GRAYSCALE_STYLE: DiagramStyle = {
         "fontsize": 8,
         "frameon": False,
     },
+    "s0": {"color": "#000000", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#000000", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#000000"},
+    "s1": {"color": "#333333", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#333333", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#333333"},
+    "t1": {"color": "#666666", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#666666", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#666666"},
+    "absorption_arrow": {"color": "#000000", "linewidth": 1.0, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 8, "label_color": "#000000", "show_label": True},
+    "isc_curve": {"color": "#333333", "linewidth": 0.75, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 8, "label_color": "#333333", "show_label": True, "curvature": 0.3},
 }
 
 # ---------------------------------------------------------------------------

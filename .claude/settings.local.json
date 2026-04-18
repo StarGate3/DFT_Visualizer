@@ -8,7 +8,13 @@
       "Bash(conda run -n dft-viz python -c ' *)",
       "Bash(C:\\\\Users\\\\Ariva\\\\miniconda3\\\\envs\\\\dft-viz\\\\python.exe *)",
       "Bash(\"/c/Users/Ariva/miniconda3/envs/dft-viz/python.exe\" -m pytest tests/test_parser.py -v)",
-      "Bash(\"/c/Users/Ariva/miniconda3/envs/dft-viz/python.exe\" -m pytest tests/test_parser.py -q)"
+      "Bash(\"/c/Users/Ariva/miniconda3/envs/dft-viz/python.exe\" -m pytest tests/test_parser.py -q)",
+      "Bash(/c/Users/Ariva/miniconda3/envs/dft-viz/python.exe -c ' *)",
+      "Bash(python -m py_compile main.py)",
+      "Bash(python -m py_compile src/gui/main_window.py)",
+      "Bash(python -m py_compile src/gui/style_panel.py)",
+      "Bash(python -m py_compile src/gui/diagram_widgets/state_diagram.py)",
+      "Bash(python -m py_compile src/plotting/style_presets.py)"
     ]
   }
 }
