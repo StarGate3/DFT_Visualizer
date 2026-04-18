@@ -66,6 +66,15 @@ _PUBLICATION_FONTS: list[str] = [
 
 _FALLBACK_FONT = "DejaVu Sans"
 
+_FORMAT_TOOLTIP = (
+    "Python format string for numeric values.\n"
+    "Examples:\n"
+    "  {:.2f} eV   \u2192  '\u22125.23 eV'\n"
+    "  {:.3f} eV   \u2192  '\u22125.234 eV'\n"
+    "  {:.1f}      \u2192  '\u22125.2'\n"
+    "Use { } to mark where the number goes."
+)
+
 
 def _is_font_available(name: str) -> bool:
     """Return True if matplotlib can resolve *name* without falling back."""
@@ -286,6 +295,7 @@ class StylePanel(QWidget):
         form.addRow("Value font size:", self._homo_fs_spin)
 
         self._homo_fmt_edit = QLineEdit()
+        self._homo_fmt_edit.setToolTip(_FORMAT_TOOLTIP)
         self._homo_fmt_edit.textChanged.connect(self._on_homo_fmt_changed)
         form.addRow("Value format:", self._homo_fmt_edit)
 
@@ -322,6 +332,7 @@ class StylePanel(QWidget):
         form.addRow("Value font size:", self._lumo_fs_spin)
 
         self._lumo_fmt_edit = QLineEdit()
+        self._lumo_fmt_edit.setToolTip(_FORMAT_TOOLTIP)
         self._lumo_fmt_edit.textChanged.connect(self._on_lumo_fmt_changed)
         form.addRow("Value format:", self._lumo_fmt_edit)
 
@@ -358,6 +369,7 @@ class StylePanel(QWidget):
         form.addRow("Gap font size:", self._gap_fs_spin)
 
         self._gap_fmt_edit = QLineEdit()
+        self._gap_fmt_edit.setToolTip(_FORMAT_TOOLTIP)
         self._gap_fmt_edit.textChanged.connect(self._on_gap_fmt_changed)
         form.addRow("Gap format:", self._gap_fmt_edit)
 
@@ -677,6 +689,17 @@ class StylePanel(QWidget):
         self._fc_isc_label_fs_spin.valueChanged.connect(self._on_fc_isc_label_fs_changed)
         form.addRow("Label font size:", self._fc_isc_label_fs_spin)
 
+        self._fc_isc_curvature_spin = QDoubleSpinBox()
+        self._fc_isc_curvature_spin.setRange(-1.0, 1.0)
+        self._fc_isc_curvature_spin.setSingleStep(0.05)
+        self._fc_isc_curvature_spin.setDecimals(2)
+        self._fc_isc_curvature_spin.setToolTip(
+            "Arc curvature of the FC ISC arrow.\n"
+            "Negative = curves left/down, positive = curves right/up."
+        )
+        self._fc_isc_curvature_spin.valueChanged.connect(self._on_fc_isc_curvature_changed)
+        form.addRow("Curvature:", self._fc_isc_curvature_spin)
+
         return w
 
     def _build_bottom_buttons(self, layout: QVBoxLayout) -> None:
@@ -855,6 +878,7 @@ class StylePanel(QWidget):
                 self._fc_isc_show_label_cb.setChecked(isc_fc_s.get("show_label", True))
                 self._fc_isc_label_edit.setText(isc_fc_s.get("label_text", "ISC"))
                 self._fc_isc_label_fs_spin.setValue(isc_fc_s.get("label_fontsize", 9))
+                self._fc_isc_curvature_spin.setValue(isc_fc_s.get("curvature", -0.3))
 
             # FC Axis Labels
             fc_axes_s = style.get("fc_axes", {})  # type: ignore[call-overload]
@@ -1333,6 +1357,12 @@ class StylePanel(QWidget):
         if self._updating:
             return
         self._current_style["fc_isc"]["label_fontsize"] = value  # type: ignore[index]
+        self._schedule_emit()
+
+    def _on_fc_isc_curvature_changed(self, value: float) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_isc"]["curvature"] = value  # type: ignore[index]
         self._schedule_emit()
 
     # FC Axis Labels slots

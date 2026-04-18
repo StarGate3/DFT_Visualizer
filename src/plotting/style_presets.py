@@ -151,6 +151,7 @@ class FCIscStyle(TypedDict):
     show_label: bool
     label_text: str
     label_fontsize: int
+    curvature: float  # arc3 rad value; negative = curves left/down
 
 
 class FCAxesStyle(TypedDict):
@@ -263,7 +264,7 @@ DEFAULT_STYLE: DiagramStyle = {
     "fc_vertical_arrow": {"color": "#3A5FCD", "linewidth": 1.8, "arrow_style": "-|>", "show": True},
     "fc_adiabatic_arrow": {"color": "#3A5FCD", "linewidth": 1.5, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
-    "fc_isc": {"color": "#666666", "linewidth": 1.3, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 10},
+    "fc_isc": {"color": "#666666", "linewidth": 1.3, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 10, "curvature": -0.3},
     "fc_axes": {"color": "#333333", "linewidth": 1.3, "ylabel_text": "Energy", "ylabel_fontsize": 12, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 11},
     "label_overrides": {},
 }
@@ -340,7 +341,7 @@ PUBLICATION_STYLE: DiagramStyle = {
     "fc_vertical_arrow": {"color": "#1F3C7A", "linewidth": 1.0, "arrow_style": "-|>", "show": True},
     "fc_adiabatic_arrow": {"color": "#1F3C7A", "linewidth": 1.0, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
-    "fc_isc": {"color": "#555555", "linewidth": 1.0, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 8},
+    "fc_isc": {"color": "#555555", "linewidth": 1.0, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 8, "curvature": -0.3},
     "fc_axes": {"color": "#333333", "linewidth": 1.0, "ylabel_text": "Energy", "ylabel_fontsize": 11, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 10},
     "label_overrides": {},
 }
@@ -418,7 +419,7 @@ COLORBLIND_STYLE: DiagramStyle = {
     "fc_vertical_arrow": {"color": "#0072B2", "linewidth": 1.5, "arrow_style": "-|>", "show": True},
     "fc_adiabatic_arrow": {"color": "#0072B2", "linewidth": 1.2, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
-    "fc_isc": {"color": "#555555", "linewidth": 1.3, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9},
+    "fc_isc": {"color": "#555555", "linewidth": 1.3, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9, "curvature": -0.3},
     "fc_axes": {"color": "#333333", "linewidth": 1.0, "ylabel_text": "Energy", "ylabel_fontsize": 11, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 10},
     "label_overrides": {},
 }
@@ -495,7 +496,7 @@ GRAYSCALE_STYLE: DiagramStyle = {
     "fc_vertical_arrow": {"color": "#000000", "linewidth": 1.0, "arrow_style": "-|>", "show": True},
     "fc_adiabatic_arrow": {"color": "#000000", "linewidth": 1.0, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
-    "fc_isc": {"color": "#000000", "linewidth": 1.2, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9},
+    "fc_isc": {"color": "#000000", "linewidth": 1.2, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9, "curvature": -0.3},
     "fc_axes": {"color": "#333333", "linewidth": 1.0, "ylabel_text": "Energy", "ylabel_fontsize": 11, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 10},
     "label_overrides": {},
 }

@@ -203,10 +203,20 @@ class MainWindow(QMainWindow):
         self._toggle_style_action.setChecked(True)
         view_menu.addAction(self._toggle_style_action)
 
+        view_menu.addSeparator()
+        for i, name in enumerate(["HOMO/LUMO", "S0/S1/T1 States", "Franck-Condon"]):
+            act = QAction(f"&{i + 1} {name}", self)
+            act.setShortcut(f"Ctrl+{i + 1}")
+            act.triggered.connect(
+                lambda checked=False, idx=i: self._tab_widget.setCurrentIndex(idx)
+            )
+            view_menu.addAction(act)
+
     def _build_help_menu(self, menu_bar: object) -> None:
         help_menu: QMenu = menu_bar.addMenu("&Help")  # type: ignore[attr-defined]
 
         about_action = QAction("&About", self)
+        about_action.setShortcut("F1")
         about_action.triggered.connect(lambda: self._show_about())
         help_menu.addAction(about_action)
 

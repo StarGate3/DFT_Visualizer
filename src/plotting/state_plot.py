@@ -180,6 +180,7 @@ class StateDiagramPlotter:
                 arrowstyle=abs_s.get("arrow_style", "-|>"),
                 color=abs_s.get("color", "#333333"),
                 lw=abs_s.get("linewidth", 1.5),
+                mutation_scale=14,
             ),
             annotation_clip=False,
         )
@@ -230,7 +231,7 @@ class StateDiagramPlotter:
             color=isc_s.get("color", "#555555"),
             linewidth=isc_s.get("linewidth", 1.2),
             linestyle=mpl_ls,
-            mutation_scale=10,
+            mutation_scale=12,
             zorder=3,
         )
         ax.add_patch(isc_patch)

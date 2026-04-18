@@ -278,7 +278,7 @@ class FranckCondonPlotter:
                     arrowstyle="-|>",
                     color=v.get("color", "#3A5FCD"),
                     linewidth=v.get("linewidth", 1.8),
-                    mutation_scale=15,
+                    mutation_scale=14,
                 ),
                 zorder=5,
             )
@@ -315,6 +315,7 @@ class FranckCondonPlotter:
         linewidth = isc.get("linewidth", 1.3)
 
         # S1 is now at r=0.30, T1 at r=0.55; arrow goes right-down
+        curv = isc.get("curvature", -0.3)
         arrow = FancyArrowPatch(
             (_R_EQ["S1"] + 0.04, _Y_MIN["S1"] + 0.02),
             (_R_EQ["T1"] - 0.04, _Y_MIN["T1"] + 0.02),
@@ -322,8 +323,8 @@ class FranckCondonPlotter:
             color=color,
             linewidth=linewidth,
             linestyle=(0, (3, 2)),
-            connectionstyle="arc3,rad=-0.3",  # curves up-right
-            mutation_scale=10,
+            connectionstyle=f"arc3,rad={curv}",
+            mutation_scale=14,
             zorder=5,
         )
         ax.add_patch(arrow)
