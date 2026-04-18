@@ -1,0 +1,248 @@
+"""Main application window for DFT Visualizer."""
+
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QAction, QFont, QIcon
+from PyQt6.QtWidgets import (
+    QDockWidget,
+    QLabel,
+    QMainWindow,
+    QMenu,
+    QStatusBar,
+    QTabWidget,
+    QWidget,
+)
+
+
+class MainWindow(QMainWindow):
+    """Primary window of the DFT Visualizer application.
+
+    Hosts the menu bar, a three-tab central diagram area, two dock panels
+    (Data and Style & Appearance), and a status bar.
+    """
+
+    WINDOW_TITLE: str = "DFT Visualizer"
+    DEFAULT_WIDTH: int = 1400
+    DEFAULT_HEIGHT: int = 900
+    MIN_WIDTH: int = 1000
+    MIN_HEIGHT: int = 700
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        """Initialize the main window, building all UI components."""
+        super().__init__(parent)
+        self._setup_window()
+        self._build_menu_bar()
+        self._build_central_widget()
+        self._build_dock_widgets()
+        self._build_status_bar()
+
+    # ------------------------------------------------------------------
+    # Window setup
+    # ------------------------------------------------------------------
+
+    def _setup_window(self) -> None:
+        """Configure window geometry, title, and icon."""
+        self.setWindowTitle(self.WINDOW_TITLE)
+        self.resize(self.DEFAULT_WIDTH, self.DEFAULT_HEIGHT)
+        self.setMinimumSize(self.MIN_WIDTH, self.MIN_HEIGHT)
+        # TODO: replace QIcon() with an actual application icon asset
+        self.setWindowIcon(QIcon())
+
+    # ------------------------------------------------------------------
+    # Menu bar
+    # ------------------------------------------------------------------
+
+    def _build_menu_bar(self) -> None:
+        """Construct the full menu bar with all menus and actions."""
+        menu_bar = self.menuBar()
+        assert menu_bar is not None
+
+        self._build_file_menu(menu_bar)
+        self._build_edit_menu(menu_bar)
+        self._build_view_menu(menu_bar)
+        self._build_export_menu(menu_bar)
+        self._build_help_menu(menu_bar)
+
+    def _build_file_menu(self, menu_bar: object) -> None:
+        """Create the File menu with project and import actions."""
+        file_menu: QMenu = menu_bar.addMenu("&File")  # type: ignore[attr-defined]
+
+        new_action = QAction("&New Project", self)
+        new_action.setShortcut("Ctrl+N")
+        new_action.triggered.connect(lambda: self._stub("new_project"))
+        file_menu.addAction(new_action)
+
+        open_action = QAction("&Open Project…", self)
+        open_action.setShortcut("Ctrl+O")
+        open_action.triggered.connect(lambda: self._stub("open_project"))
+        file_menu.addAction(open_action)
+
+        save_action = QAction("&Save Project", self)
+        save_action.setShortcut("Ctrl+S")
+        save_action.triggered.connect(lambda: self._stub("save_project"))
+        file_menu.addAction(save_action)
+
+        save_as_action = QAction("Save Project &As…", self)
+        save_as_action.setShortcut("Ctrl+Shift+S")
+        save_as_action.triggered.connect(lambda: self._stub("save_project_as"))
+        file_menu.addAction(save_as_action)
+
+        file_menu.addSeparator()
+
+        import_action = QAction("&Import Excel…", self)
+        import_action.setShortcut("Ctrl+I")
+        import_action.triggered.connect(lambda: self._stub("import_excel"))
+        file_menu.addAction(import_action)
+
+        file_menu.addSeparator()
+
+        exit_action = QAction("E&xit", self)
+        exit_action.setShortcut("Ctrl+Q")
+        exit_action.triggered.connect(self.close)
+        file_menu.addAction(exit_action)
+
+    def _build_edit_menu(self, menu_bar: object) -> None:
+        """Create the Edit menu. Undo/Redo are disabled pending Command pattern implementation."""
+        edit_menu: QMenu = menu_bar.addMenu("&Edit")  # type: ignore[attr-defined]
+
+        # TODO: enable once Command pattern (undo/redo stack) is implemented
+        undo_action = QAction("&Undo", self)
+        undo_action.setShortcut("Ctrl+Z")
+        undo_action.setEnabled(False)
+        undo_action.triggered.connect(lambda: self._stub("undo"))
+        edit_menu.addAction(undo_action)
+
+        redo_action = QAction("&Redo", self)
+        redo_action.setShortcut("Ctrl+Y")
+        redo_action.setEnabled(False)
+        redo_action.triggered.connect(lambda: self._stub("redo"))
+        edit_menu.addAction(redo_action)
+
+        self._undo_action = undo_action
+        self._redo_action = redo_action
+
+    def _build_view_menu(self, menu_bar: object) -> None:
+        """Create the View menu with dock panel toggles.
+
+        Stored as instance attributes so the dock widgets can be referenced
+        once they are created in _build_dock_widgets.
+        """
+        view_menu: QMenu = menu_bar.addMenu("&View")  # type: ignore[attr-defined]
+
+        self._toggle_data_action = QAction("Toggle &Data Panel", self)
+        self._toggle_data_action.setCheckable(True)
+        self._toggle_data_action.setChecked(True)
+        view_menu.addAction(self._toggle_data_action)
+
+        self._toggle_style_action = QAction("Toggle &Style Panel", self)
+        self._toggle_style_action.setCheckable(True)
+        self._toggle_style_action.setChecked(True)
+        view_menu.addAction(self._toggle_style_action)
+
+    def _build_export_menu(self, menu_bar: object) -> None:
+        """Create the Export menu. Actions disabled until plotting is implemented."""
+        export_menu: QMenu = menu_bar.addMenu("E&xport")  # type: ignore[attr-defined]
+
+        # TODO: enable once plotting and export pipeline are implemented
+        png_action = QAction("Export as &PNG…", self)
+        png_action.setEnabled(False)
+        png_action.triggered.connect(lambda: self._stub("export_png"))
+        export_menu.addAction(png_action)
+
+        tiff_action = QAction("Export as &TIFF…", self)
+        tiff_action.setEnabled(False)
+        tiff_action.triggered.connect(lambda: self._stub("export_tiff"))
+        export_menu.addAction(tiff_action)
+
+    def _build_help_menu(self, menu_bar: object) -> None:
+        """Create the Help menu."""
+        help_menu: QMenu = menu_bar.addMenu("&Help")  # type: ignore[attr-defined]
+
+        about_action = QAction("&About", self)
+        about_action.triggered.connect(lambda: self._stub("about"))
+        help_menu.addAction(about_action)
+
+        docs_action = QAction("&Documentation", self)
+        docs_action.triggered.connect(lambda: self._stub("documentation"))
+        help_menu.addAction(docs_action)
+
+    # ------------------------------------------------------------------
+    # Central widget (tab area)
+    # ------------------------------------------------------------------
+
+    def _build_central_widget(self) -> None:
+        """Create the three-tab central diagram area."""
+        self._tab_widget = QTabWidget(self)
+        self.setCentralWidget(self._tab_widget)
+
+        tab_specs: list[tuple[str, str]] = [
+            ("HOMO/LUMO", "HOMO/LUMO diagram will appear here"),
+            ("S0/S1/T1 States", "State diagram will appear here"),
+            ("Franck-Condon", "Franck-Condon diagram will appear here"),
+        ]
+
+        for tab_title, placeholder_text in tab_specs:
+            placeholder = self._make_placeholder_label(placeholder_text)
+            self._tab_widget.addTab(placeholder, tab_title)
+
+    def _make_placeholder_label(self, text: str) -> QLabel:
+        """Return a centered, styled placeholder QLabel for an empty tab."""
+        label = QLabel(text)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        font = QFont()
+        font.setPointSize(14)
+        label.setFont(font)
+        label.setStyleSheet("color: #888888;")
+        return label
+
+    # ------------------------------------------------------------------
+    # Dock widgets
+    # ------------------------------------------------------------------
+
+    def _build_dock_widgets(self) -> None:
+        """Create the Data and Style dock widgets and wire them to View menu toggles."""
+        allowed_areas = (
+            Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea
+        )
+
+        # Data dock — left side
+        self._data_dock = QDockWidget("Data", self)
+        self._data_dock.setAllowedAreas(allowed_areas)
+        data_placeholder = QLabel("Data panel will appear here")
+        data_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._data_dock.setWidget(data_placeholder)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self._data_dock)
+
+        # Style dock — right side
+        self._style_dock = QDockWidget("Style & Appearance", self)
+        self._style_dock.setAllowedAreas(allowed_areas)
+        style_placeholder = QLabel("Style panel will appear here")
+        style_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._style_dock.setWidget(style_placeholder)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self._style_dock)
+
+        # Wire View menu toggles
+        self._toggle_data_action.toggled.connect(self._data_dock.setVisible)
+        self._toggle_style_action.toggled.connect(self._style_dock.setVisible)
+
+        # Keep menu checkboxes in sync when user closes docks via the 'X' button
+        self._data_dock.visibilityChanged.connect(self._toggle_data_action.setChecked)
+        self._style_dock.visibilityChanged.connect(self._toggle_style_action.setChecked)
+
+    # ------------------------------------------------------------------
+    # Status bar
+    # ------------------------------------------------------------------
+
+    def _build_status_bar(self) -> None:
+        """Create and configure the status bar."""
+        status_bar = QStatusBar(self)
+        self.setStatusBar(status_bar)
+        status_bar.showMessage("Ready")
+
+    # ------------------------------------------------------------------
+    # Stub handler
+    # ------------------------------------------------------------------
+
+    def _stub(self, action_name: str) -> None:
+        """Print a placeholder message for unimplemented menu actions."""
+        print(f"TODO: Implement {action_name}")
