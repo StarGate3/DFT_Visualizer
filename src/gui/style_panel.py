@@ -171,6 +171,7 @@ class StylePanel(QWidget):
         tb.addItem(self._build_fc_curve_page("fc_t1", "T1"), "T1 Curve")
         tb.addItem(self._build_fc_transitions_page(), "Transitions")
         tb.addItem(self._build_fc_isc_page(), "ISC")
+        tb.addItem(self._build_fc_axes_page(), "Axis Labels")
         tb.addItem(self._build_fc_guide_lines_page(), "Guide Lines")
         return tb
 
@@ -570,6 +571,29 @@ class StylePanel(QWidget):
 
         return w
 
+    def _build_fc_axes_page(self) -> QWidget:
+        w, form = self._make_page()
+
+        self._fc_axes_ylabel_edit = QLineEdit()
+        self._fc_axes_ylabel_edit.textChanged.connect(self._on_fc_axes_ylabel_changed)
+        form.addRow("Y-axis label:", self._fc_axes_ylabel_edit)
+
+        self._fc_axes_ylabel_fs_spin = QSpinBox()
+        self._fc_axes_ylabel_fs_spin.setRange(6, 24)
+        self._fc_axes_ylabel_fs_spin.valueChanged.connect(self._on_fc_axes_ylabel_fs_changed)
+        form.addRow("Y-axis font size:", self._fc_axes_ylabel_fs_spin)
+
+        self._fc_axes_xlabel_edit = QLineEdit()
+        self._fc_axes_xlabel_edit.textChanged.connect(self._on_fc_axes_xlabel_changed)
+        form.addRow("X-axis label:", self._fc_axes_xlabel_edit)
+
+        self._fc_axes_xlabel_fs_spin = QSpinBox()
+        self._fc_axes_xlabel_fs_spin.setRange(6, 24)
+        self._fc_axes_xlabel_fs_spin.valueChanged.connect(self._on_fc_axes_xlabel_fs_changed)
+        form.addRow("X-axis font size:", self._fc_axes_xlabel_fs_spin)
+
+        return w
+
     def _build_fc_guide_lines_page(self) -> QWidget:
         w, form = self._make_page()
 
@@ -800,6 +824,14 @@ class StylePanel(QWidget):
                 self._fc_isc_show_label_cb.setChecked(isc_fc_s.get("show_label", True))
                 self._fc_isc_label_edit.setText(isc_fc_s.get("label_text", "ISC"))
                 self._fc_isc_label_fs_spin.setValue(isc_fc_s.get("label_fontsize", 9))
+
+            # FC Axis Labels
+            fc_axes_s = style.get("fc_axes", {})  # type: ignore[call-overload]
+            if fc_axes_s and hasattr(self, "_fc_axes_ylabel_edit"):
+                self._fc_axes_ylabel_edit.setText(fc_axes_s.get("ylabel_text", "Energy"))
+                self._fc_axes_ylabel_fs_spin.setValue(fc_axes_s.get("ylabel_fontsize", 12))
+                self._fc_axes_xlabel_edit.setText(fc_axes_s.get("xlabel_text", "Reaction coordinate (r)"))
+                self._fc_axes_xlabel_fs_spin.setValue(fc_axes_s.get("xlabel_fontsize", 11))
 
         finally:
             self._updating = False
@@ -1258,6 +1290,32 @@ class StylePanel(QWidget):
         if self._updating:
             return
         self._current_style["fc_isc"]["label_fontsize"] = value  # type: ignore[index]
+        self._schedule_emit()
+
+    # FC Axis Labels slots
+
+    def _on_fc_axes_ylabel_changed(self, text: str) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_axes"]["ylabel_text"] = text  # type: ignore[index]
+        self._schedule_emit()
+
+    def _on_fc_axes_ylabel_fs_changed(self, value: int) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_axes"]["ylabel_fontsize"] = value  # type: ignore[index]
+        self._schedule_emit()
+
+    def _on_fc_axes_xlabel_changed(self, text: str) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_axes"]["xlabel_text"] = text  # type: ignore[index]
+        self._schedule_emit()
+
+    def _on_fc_axes_xlabel_fs_changed(self, value: int) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_axes"]["xlabel_fontsize"] = value  # type: ignore[index]
         self._schedule_emit()
 
     def _set_color_btn(self, btn: QPushButton, hex_color: str) -> None:

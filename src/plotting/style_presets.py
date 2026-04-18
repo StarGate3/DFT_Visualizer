@@ -151,9 +151,12 @@ class FCIscStyle(TypedDict):
 
 
 class FCAxesStyle(TypedDict):
-    show_x_axis: bool
-    xlabel: str
-    ylabel_unit: str
+    color: str
+    linewidth: float
+    ylabel_text: str
+    ylabel_fontsize: int
+    xlabel_text: str
+    xlabel_fontsize: int
 
 
 class DiagramStyle(TypedDict):
@@ -192,7 +195,7 @@ DEFAULT_STYLE: DiagramStyle = {
     },
     "title": {
         "text": "Molecular Energy Diagram",
-        "fontsize": 14,
+        "fontsize": 15,
         "fontfamily": "DejaVu Sans",
         "fontweight": "bold",
         "color": "#000000",
@@ -249,14 +252,14 @@ DEFAULT_STYLE: DiagramStyle = {
     "t1": {"color": "#2E6B3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#2E6B3C"},
     "absorption_arrow": {"color": "#333333", "linewidth": 1.5, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 9, "label_color": "#333333", "show_label": True},
     "isc_curve": {"color": "#555555", "linewidth": 1.2, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 9, "label_color": "#555555", "show_label": True, "curvature": 0.3},
-    "fc_s0": {"color": "#1F3C7A", "linewidth": 1.8, "label_text": "$S_0$", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.0, "k_factor": 1.0},
-    "fc_s1": {"color": "#3A5FCD", "linewidth": 1.8, "label_text": "$S_1$", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.5, "k_factor": 1.0},
-    "fc_t1": {"color": "#2E8B57", "linewidth": 1.8, "label_text": "$T_1$", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.3, "k_factor": 1.0},
+    "fc_s0": {"color": "#1F3C7A", "linewidth": 1.8, "label_text": "$S_0$", "label_fontsize": 14, "value_fontsize": 10, "r_eq": 0.0, "k_factor": 1.0},
+    "fc_s1": {"color": "#3A5FCD", "linewidth": 1.8, "label_text": "$S_1$", "label_fontsize": 14, "value_fontsize": 10, "r_eq": 0.5, "k_factor": 1.0},
+    "fc_t1": {"color": "#2E8B57", "linewidth": 1.8, "label_text": "$T_1$", "label_fontsize": 14, "value_fontsize": 10, "r_eq": 0.3, "k_factor": 1.0},
     "fc_vertical_arrow": {"color": "#3A5FCD", "linewidth": 1.8, "arrow_style": "-|>", "show": True},
     "fc_adiabatic_arrow": {"color": "#3A5FCD", "linewidth": 1.5, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
-    "fc_isc": {"color": "#666666", "linewidth": 1.3, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9},
-    "fc_axes": {"show_x_axis": False, "xlabel": "Reaction Coordinate", "ylabel_unit": "kcal/mol"},
+    "fc_isc": {"color": "#666666", "linewidth": 1.3, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 10},
+    "fc_axes": {"color": "#333333", "linewidth": 1.3, "ylabel_text": "Energy", "ylabel_fontsize": 12, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 11},
 }
 
 PUBLICATION_STYLE: DiagramStyle = {
@@ -331,7 +334,7 @@ PUBLICATION_STYLE: DiagramStyle = {
     "fc_adiabatic_arrow": {"color": "#1F3C7A", "linewidth": 1.0, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
     "fc_isc": {"color": "#555555", "linewidth": 1.0, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 8},
-    "fc_axes": {"show_x_axis": False, "xlabel": "Reaction Coordinate", "ylabel_unit": "kcal/mol"},
+    "fc_axes": {"color": "#333333", "linewidth": 1.0, "ylabel_text": "Energy", "ylabel_fontsize": 11, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 10},
 }
 
 # Okabe-Ito colorblind-safe palette
@@ -407,7 +410,7 @@ COLORBLIND_STYLE: DiagramStyle = {
     "fc_adiabatic_arrow": {"color": "#0072B2", "linewidth": 1.2, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
     "fc_isc": {"color": "#555555", "linewidth": 1.3, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9},
-    "fc_axes": {"show_x_axis": False, "xlabel": "Reaction Coordinate", "ylabel_unit": "kcal/mol"},
+    "fc_axes": {"color": "#333333", "linewidth": 1.0, "ylabel_text": "Energy", "ylabel_fontsize": 11, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 10},
 }
 
 GRAYSCALE_STYLE: DiagramStyle = {
@@ -482,8 +485,55 @@ GRAYSCALE_STYLE: DiagramStyle = {
     "fc_adiabatic_arrow": {"color": "#000000", "linewidth": 1.0, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
     "fc_isc": {"color": "#000000", "linewidth": 1.2, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9},
-    "fc_axes": {"show_x_axis": False, "xlabel": "Reaction Coordinate", "ylabel_unit": "kcal/mol"},
+    "fc_axes": {"color": "#333333", "linewidth": 1.0, "ylabel_text": "Energy", "ylabel_fontsize": 11, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 10},
 }
+
+def _make_publication_high_dpi() -> DiagramStyle:
+    """Build the Publication High-DPI preset from PUBLICATION_STYLE."""
+    p = copy.deepcopy(PUBLICATION_STYLE)
+    p["title"]["fontsize"] = 14
+    p["title"]["fontfamily"] = "Arial"
+    p["figure"]["dpi"] = 600
+    p["homo"]["linewidth"] = 2.0
+    p["homo"]["value_fontsize"] = 10
+    p["lumo"]["linewidth"] = 2.0
+    p["lumo"]["value_fontsize"] = 10
+    p["gap_arrow"]["linewidth"] = 1.5
+    p["gap_arrow"]["fontsize"] = 10
+    p["s0"]["linewidth"] = 2.0
+    p["s0"]["value_fontsize"] = 10
+    p["s0"]["label_fontsize"] = 13
+    p["s1"]["linewidth"] = 2.0
+    p["s1"]["value_fontsize"] = 10
+    p["s1"]["label_fontsize"] = 13
+    p["t1"]["linewidth"] = 2.0
+    p["t1"]["value_fontsize"] = 10
+    p["t1"]["label_fontsize"] = 13
+    p["absorption_arrow"]["linewidth"] = 1.8
+    p["absorption_arrow"]["label_fontsize"] = 10
+    p["isc_curve"]["linewidth"] = 1.5
+    p["isc_curve"]["label_fontsize"] = 10
+    p["fc_s0"]["linewidth"] = 2.4
+    p["fc_s0"]["label_fontsize"] = 13
+    p["fc_s0"]["value_fontsize"] = 10
+    p["fc_s1"]["linewidth"] = 2.4
+    p["fc_s1"]["label_fontsize"] = 13
+    p["fc_s1"]["value_fontsize"] = 10
+    p["fc_t1"]["linewidth"] = 2.4
+    p["fc_t1"]["label_fontsize"] = 13
+    p["fc_t1"]["value_fontsize"] = 10
+    p["fc_vertical_arrow"]["linewidth"] = 2.0
+    p["fc_adiabatic_arrow"]["linewidth"] = 1.8
+    p["fc_isc"]["linewidth"] = 1.6
+    p["fc_isc"]["label_fontsize"] = 10
+    p["fc_axes"]["linewidth"] = 1.5
+    p["fc_axes"]["ylabel_fontsize"] = 12
+    p["fc_axes"]["xlabel_fontsize"] = 11
+    return p  # type: ignore[return-value]
+
+
+PUBLICATION_HIGH_DPI_STYLE: DiagramStyle = _make_publication_high_dpi()
+
 
 # ---------------------------------------------------------------------------
 # Registry
@@ -492,6 +542,7 @@ GRAYSCALE_STYLE: DiagramStyle = {
 _PRESETS: dict[str, DiagramStyle] = {
     "Default": DEFAULT_STYLE,
     "Publication": PUBLICATION_STYLE,
+    "Publication High-DPI": PUBLICATION_HIGH_DPI_STYLE,
     "Colorblind-safe": COLORBLIND_STYLE,
     "Grayscale": GRAYSCALE_STYLE,
 }

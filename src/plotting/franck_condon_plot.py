@@ -1,28 +1,22 @@
-"""Franck-Condon diagram plotter — fixed-template schematic (v6).
+"""Franck-Condon diagram plotter — fixed-template schematic (v7).
 
 Draws a spectroscopy-oriented Franck-Condon diagram. The curve shapes,
 transitions, and guide lines are all fixed; only numeric energy values,
 compound name, and unit strings depend on the input data.
 
-v6 change (vs v5):
-- Recalibrated S1 and T1 positions so the vertical absorption arrow
-  tip touches the S1 curve exactly at r=0 (Franck-Condon principle).
-  S1 moved to r_eq=0.22 (was 0.15), T1 to r_eq=0.47 (was 0.40).
+v7 change (vs v6):
+- Axis label fonts ("Energy", "Reaction coordinate") now read from
+  style["fc_axes"]["ylabel_fontsize"] and ["xlabel_fontsize"] instead
+  of being hardcoded. This lets users tune axis label sizes from the
+  style panel, which matters when exporting to single-column
+  publication figures where default sizes may be too small.
 
-v5 changes:
-- Integrated L-shape axes with arrow heads on both ends
-- "Energy" label moved further left to avoid overlap
-- "Reaction coordinate (r)" label below X-axis
-- Guide lines no longer extend through the Y-axis
+v6 change: Recalibrated S1/T1 positions so the vertical absorption
+arrow tip meets the S1 curve at r=0 (Franck-Condon principle).
 
-v4 change:
-- Swapped S1/T1 horizontal positions for better readability.
-
-v3 changes:
-- BDE annotations removed
-- ISC curved dashed arrow between S1 and T1 minima
-- Adiabatic arrow blue dashed (not green)
-- S0 well shallower
+v5 changes: L-shape axes with arrow heads; Energy label repositioned.
+v4 change: Swapped S1/T1 for readability.
+v3 changes: BDE removed; ISC added; blue dashed adiabatic; shallower S0.
 
 Architecture:
 - Fixed schematic with data-driven labels.
@@ -481,9 +475,18 @@ class FranckCondonPlotter:
 
         This replaces the previous disconnected axis lines. Both axes
         terminate in arrow heads, in the textbook style.
+
+        Reads font sizes from style['fc_axes'] so users can tune labels
+        from the style panel. Defaults chosen for good readability in
+        single-column publications.
         """
-        axis_color = "#333333"
-        axis_lw = 1.3
+        fc_axes = style.get("fc_axes", {})
+        axis_color = fc_axes.get("color", "#333333")
+        axis_lw = fc_axes.get("linewidth", 1.3)
+        ylabel_fs = fc_axes.get("ylabel_fontsize", 11)
+        xlabel_fs = fc_axes.get("xlabel_fontsize", 10)
+        ylabel_text = fc_axes.get("ylabel_text", "Energy")
+        xlabel_text = fc_axes.get("xlabel_text", "Reaction coordinate (r)")
 
         # Y-axis — from origin corner up to top, with arrow head
         ax.annotate(
@@ -509,8 +512,8 @@ class FranckCondonPlotter:
         # overlap with in-plot energy annotations like $S_1^{ver}=73.3$
         ax.text(
             _AXIS_ORIGIN_X - 0.04, (_AXIS_ORIGIN_Y + _Y_TOP) / 2,
-            "Energy",
-            color=axis_color, fontsize=11, fontweight="bold",
+            ylabel_text,
+            color=axis_color, fontsize=ylabel_fs, fontweight="bold",
             rotation=90, ha="center", va="center",
             zorder=2,
         )
@@ -518,8 +521,8 @@ class FranckCondonPlotter:
         # "Reaction coordinate (r)" label below X-axis
         ax.text(
             (_AXIS_ORIGIN_X + _X_RIGHT) / 2, _AXIS_ORIGIN_Y - 0.04,
-            "Reaction coordinate (r)",
-            color=axis_color, fontsize=10, fontstyle="italic",
+            xlabel_text,
+            color=axis_color, fontsize=xlabel_fs, fontstyle="italic",
             ha="center", va="top",
             zorder=2,
         )
