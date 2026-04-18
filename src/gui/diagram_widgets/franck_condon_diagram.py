@@ -111,5 +111,11 @@ class FranckCondonDiagramWidget(BaseDiagramWidget):
         self.figure.subplots_adjust(left=0.04, right=0.88, top=0.92, bottom=0.04)
         self.canvas.draw_idle()
 
+    def get_selected_compound(self) -> str:
+        return self._compound_combo.currentText()
+
+    def get_selected_unit(self) -> str:
+        return self._unit_combo.currentText()
+
     def _on_control_changed(self, _: object = None) -> None:
         self._draw()

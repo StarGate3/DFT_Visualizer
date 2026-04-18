@@ -59,12 +59,58 @@ class BaseDiagramWidget(QWidget):
     # Export (full implementation comes in Stage 6)
     # ------------------------------------------------------------------
 
-    def export_figure(self, filepath: Path, dpi: int = 300) -> None:
-        """Save the current figure to *filepath* at the given *dpi*.
+    def export_figure(
+        self,
+        filepath: Path,
+        dpi: int,
+        fmt: str,
+        figsize_cm: Optional[tuple[float, float]],
+        background: str,
+        tiff_compression: str = "lzw",
+    ) -> None:
+        """Save the figure to *filepath* with publication-quality settings.
 
         Args:
-            filepath: Destination path (extension determines format).
-            dpi: Output resolution in dots per inch.
+            filepath: Destination file path.
+            dpi: Resolution in DPI (ignored by matplotlib for vector formats).
+            fmt: Format string — 'png', 'tiff', 'svg', or 'pdf'.
+            figsize_cm: (width, height) in centimetres; None keeps current size.
+            background: 'transparent', 'white', or 'style' (use figure colour).
+            tiff_compression: 'lzw', 'deflate', or 'none' (TIFF only).
         """
-        logger.debug("Exporting figure to %s at %d DPI", filepath, dpi)
-        self.figure.savefig(filepath, dpi=dpi, bbox_inches="tight")
+        orig_size = self.figure.get_size_inches()
+        try:
+            if figsize_cm is not None:
+                self.figure.set_size_inches(
+                    figsize_cm[0] / 2.54, figsize_cm[1] / 2.54
+                )
+
+            if background == "transparent":
+                facecolor: object = (0.0, 0.0, 0.0, 0.0)
+            elif background == "white":
+                facecolor = "white"
+            else:
+                facecolor = self.figure.get_facecolor()
+
+            kwargs: dict = {
+                "format": fmt,
+                "dpi": dpi,
+                "bbox_inches": "tight",
+                "facecolor": facecolor,
+                "edgecolor": "none",
+            }
+            if fmt.lower() == "tiff":
+                _compression_map = {
+                    "lzw": "tiff_lzw",
+                    "deflate": "tiff_deflate",
+                    "none": "raw",
+                }
+                kwargs["pil_kwargs"] = {
+                    "compression": _compression_map.get(tiff_compression, "tiff_lzw")
+                }
+
+            logger.debug("Exporting %s → %s at %d DPI", fmt.upper(), filepath, dpi)
+            self.figure.savefig(filepath, **kwargs)
+        finally:
+            self.figure.set_size_inches(*orig_size)
+            self.canvas.draw_idle()
