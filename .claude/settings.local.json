@@ -19,7 +19,8 @@
       "Bash(python -m py_compile src/plotting/homo_lumo_plot.py)",
       "Bash(python -m py_compile src/plotting/state_plot.py)",
       "Bash(python main.py)",
-      "Bash(echo \"PID $!\")"
+      "Bash(echo \"PID $!\")",
+      "Bash(python *)"
     ]
   }
 }

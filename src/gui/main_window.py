@@ -1,10 +1,11 @@
 """Main application window for DFT Visualizer."""
 
+import copy
 import logging
 from pathlib import Path
 from typing import Optional
 
-from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtCore import Qt, QTimer, QUrl
 from PyQt6.QtGui import QAction, QCloseEvent, QDesktopServices, QFont, QIcon
 from PyQt6.QtWidgets import (
     QDockWidget,
@@ -25,12 +26,14 @@ from src.gui.diagram_widgets.franck_condon_diagram import FranckCondonDiagramWid
 from src.gui.diagram_widgets.homo_lumo_diagram import HomoLumoDiagramWidget
 from src.gui.diagram_widgets.state_diagram import StateDiagramWidget
 from src.gui.export_dialog import ExportDialog
+from src.gui.history_manager import AppSnapshot, HistoryManager
 from src.gui.style_panel import StylePanel
 from src.plotting.style_presets import DEFAULT_STYLE
 
 logger = logging.getLogger(__name__)
 
 _PROJECT_FILTER = "DFT Visualizer Project (*.dftviz);;All Files (*)"
+_SNAPSHOT_DEBOUNCE_MS = 500
 
 
 class MainWindow(QMainWindow):
@@ -46,11 +49,18 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self._current_project_path: Optional[Path] = None
         self._dirty: bool = False
+        self._applying_snapshot: bool = False
+        self._history = HistoryManager()
+
         self._setup_window()
         self._build_menu_bar()
         self._build_central_widget()
         self._build_dock_widgets()
         self._build_status_bar()
+        self._init_snapshot_timer()
+
+        # Record initial state so Ctrl+Z has something to revert to
+        self._push_snapshot()
 
     # ------------------------------------------------------------------
     # Window setup
@@ -163,15 +173,22 @@ class MainWindow(QMainWindow):
         undo_action = QAction("&Undo", self)
         undo_action.setShortcut("Ctrl+Z")
         undo_action.setEnabled(False)
+        undo_action.triggered.connect(self._on_undo)
         edit_menu.addAction(undo_action)
+        self._undo_action = undo_action
 
         redo_action = QAction("&Redo", self)
         redo_action.setShortcut("Ctrl+Y")
         redo_action.setEnabled(False)
+        redo_action.triggered.connect(self._on_redo)
         edit_menu.addAction(redo_action)
-
-        self._undo_action = undo_action
         self._redo_action = redo_action
+
+        # Alternate redo shortcut: Ctrl+Shift+Z
+        redo_alt = QAction(self)
+        redo_alt.setShortcut("Ctrl+Shift+Z")
+        redo_alt.triggered.connect(self._on_redo)
+        self.addAction(redo_alt)
 
     def _build_view_menu(self, menu_bar: object) -> None:
         view_menu: QMenu = menu_bar.addMenu("&View")  # type: ignore[attr-defined]
@@ -249,7 +266,14 @@ class MainWindow(QMainWindow):
         self._data_panel.dataset_loaded.connect(self._mark_dirty)
         self._style_panel.style_changed.connect(self.refresh_active_diagram)
         self._style_panel.style_changed.connect(self._mark_dirty)
+        self._style_panel.style_changed.connect(self._schedule_snapshot)
+        self._data_panel.data_changed.connect(self._schedule_snapshot)
         self._tab_widget.currentChanged.connect(self._on_tab_changed)
+
+        # Sync label-drag style updates from diagram widgets back to style panel
+        self._homo_lumo_widget.style_changed.connect(self._on_diagram_style_changed)
+        self._state_diagram_widget.style_changed.connect(self._on_diagram_style_changed)
+        self._franck_condon_widget.style_changed.connect(self._on_diagram_style_changed)
 
         self._toggle_data_action.toggled.connect(self._data_dock.setVisible)
         self._toggle_style_action.toggled.connect(self._style_dock.setVisible)
@@ -302,6 +326,72 @@ class MainWindow(QMainWindow):
             self._franck_condon_widget.refresh(dataset, style)
 
     # ------------------------------------------------------------------
+    # Diagram style-change signal (from label drag / right-click)
+    # ------------------------------------------------------------------
+
+    def _on_diagram_style_changed(self, new_style: dict) -> None:
+        """Sync label overrides and context-menu style changes back to the style panel."""
+        if self._applying_snapshot:
+            return
+        self._style_panel.set_style(new_style)
+        self._mark_dirty()
+        self._schedule_snapshot()
+
+    # ------------------------------------------------------------------
+    # History / undo / redo
+    # ------------------------------------------------------------------
+
+    def _init_snapshot_timer(self) -> None:
+        self._snapshot_timer = QTimer(self)
+        self._snapshot_timer.setSingleShot(True)
+        self._snapshot_timer.setInterval(_SNAPSHOT_DEBOUNCE_MS)
+        self._snapshot_timer.timeout.connect(self._push_snapshot)
+
+    def _schedule_snapshot(self) -> None:
+        self._snapshot_timer.start()
+
+    def _push_snapshot(self) -> None:
+        if self._applying_snapshot:
+            return
+        dataset = self._data_panel.get_dataset()
+        style = self._style_panel.get_style()
+        ui_state = self.get_ui_state()
+        snapshot = AppSnapshot(
+            dataset=copy.deepcopy(dataset),
+            style=copy.deepcopy(style),
+            ui_state=copy.deepcopy(ui_state),
+        )
+        self._history.push(snapshot)
+        self._update_undo_redo_actions()
+
+    def _on_undo(self) -> None:
+        snapshot = self._history.undo()
+        if snapshot is not None:
+            self._apply_snapshot(snapshot)
+        self._update_undo_redo_actions()
+
+    def _on_redo(self) -> None:
+        snapshot = self._history.redo()
+        if snapshot is not None:
+            self._apply_snapshot(snapshot)
+        self._update_undo_redo_actions()
+
+    def _apply_snapshot(self, snapshot: AppSnapshot) -> None:
+        self._applying_snapshot = True
+        try:
+            self._data_panel.set_dataset(snapshot.dataset)
+            self._style_panel.set_style(snapshot.style)
+            self.apply_ui_state(snapshot.ui_state)
+            self.refresh_active_diagram()
+            self._mark_dirty()
+        finally:
+            self._applying_snapshot = False
+
+    def _update_undo_redo_actions(self) -> None:
+        self._undo_action.setEnabled(self._history.can_undo())
+        self._redo_action.setEnabled(self._history.can_redo())
+
+    # ------------------------------------------------------------------
     # Project state helpers
     # ------------------------------------------------------------------
 
@@ -343,6 +433,8 @@ class MainWindow(QMainWindow):
         self._current_project_path = None
         self._mark_clean()
         self.refresh_active_diagram()
+        self._push_snapshot()
+        self._update_undo_redo_actions()
         self._show_status("New project created.")
 
     def _on_open_project(self) -> None:
@@ -380,6 +472,8 @@ class MainWindow(QMainWindow):
         self._current_project_path = filepath
         self._mark_clean()
         self.refresh_active_diagram()
+        self._push_snapshot()
+        self._update_undo_redo_actions()
         self._show_status(f"Opened: {filepath.name}")
 
     def _on_save_project(self) -> None:
@@ -452,7 +546,6 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Export Failed", f"Export error:\n{exc}")
             return
 
-        # Success message with "Open folder" button
         paths_text = "\n".join(str(p) for p in exported)
         msg = QMessageBox(self)
         msg.setWindowTitle("Export Complete")

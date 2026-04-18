@@ -81,6 +81,7 @@ class StateLevelStyle(TypedDict):
     label_fontsize: int
     label_fontweight: str
     label_color: str
+    label_offset_below: int  # offset in pt below the line for the state name
 
 
 class AbsorptionArrowStyle(TypedDict):
@@ -91,6 +92,7 @@ class AbsorptionArrowStyle(TypedDict):
     label_fontsize: int
     label_color: str
     show_label: bool
+    x_offset: float  # horizontal shift in data units (positive = right)
 
 
 class IscCurveStyle(TypedDict):
@@ -102,6 +104,7 @@ class IscCurveStyle(TypedDict):
     label_color: str
     show_label: bool
     curvature: float
+    x_offset: float  # horizontal shift in data units (positive = right)
 
 
 class FCStateStyle(TypedDict):
@@ -247,11 +250,11 @@ DEFAULT_STYLE: DiagramStyle = {
         "fontsize": 9,
         "frameon": True,
     },
-    "s0": {"color": "#1F2E5C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#1F2E5C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#1F2E5C"},
-    "s1": {"color": "#8B2E3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#8B2E3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#8B2E3C"},
-    "t1": {"color": "#2E6B3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#2E6B3C"},
-    "absorption_arrow": {"color": "#333333", "linewidth": 1.5, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 9, "label_color": "#333333", "show_label": True},
-    "isc_curve": {"color": "#555555", "linewidth": 1.2, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 9, "label_color": "#555555", "show_label": True, "curvature": 0.3},
+    "s0": {"color": "#1F2E5C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#1F2E5C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#1F2E5C", "label_offset_below": 14},
+    "s1": {"color": "#8B2E3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#8B2E3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#8B2E3C", "label_offset_below": 14},
+    "t1": {"color": "#2E6B3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#2E6B3C", "label_offset_below": 14},
+    "absorption_arrow": {"color": "#333333", "linewidth": 1.5, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 9, "label_color": "#333333", "show_label": True, "x_offset": 0.0},
+    "isc_curve": {"color": "#555555", "linewidth": 1.2, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 9, "label_color": "#555555", "show_label": True, "curvature": 0.3, "x_offset": 0.0},
     "fc_s0": {"color": "#1F3C7A", "linewidth": 1.8, "label_text": "$S_0$", "label_fontsize": 14, "value_fontsize": 10, "r_eq": 0.0, "k_factor": 1.0},
     "fc_s1": {"color": "#3A5FCD", "linewidth": 1.8, "label_text": "$S_1$", "label_fontsize": 14, "value_fontsize": 10, "r_eq": 0.5, "k_factor": 1.0},
     "fc_t1": {"color": "#2E8B57", "linewidth": 1.8, "label_text": "$T_1$", "label_fontsize": 14, "value_fontsize": 10, "r_eq": 0.3, "k_factor": 1.0},
@@ -322,11 +325,11 @@ PUBLICATION_STYLE: DiagramStyle = {
         "fontsize": 8,
         "frameon": False,
     },
-    "s0": {"color": "#1F2E5C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#1F2E5C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#1F2E5C"},
-    "s1": {"color": "#8B2E3C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#8B2E3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#8B2E3C"},
-    "t1": {"color": "#2E6B3C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#2E6B3C"},
-    "absorption_arrow": {"color": "#333333", "linewidth": 1.0, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 8, "label_color": "#333333", "show_label": True},
-    "isc_curve": {"color": "#555555", "linewidth": 0.75, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 8, "label_color": "#555555", "show_label": True, "curvature": 0.3},
+    "s0": {"color": "#1F2E5C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#1F2E5C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#1F2E5C", "label_offset_below": 12},
+    "s1": {"color": "#8B2E3C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#8B2E3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#8B2E3C", "label_offset_below": 12},
+    "t1": {"color": "#2E6B3C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#2E6B3C", "label_offset_below": 12},
+    "absorption_arrow": {"color": "#333333", "linewidth": 1.0, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 8, "label_color": "#333333", "show_label": True, "x_offset": 0.0},
+    "isc_curve": {"color": "#555555", "linewidth": 0.75, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 8, "label_color": "#555555", "show_label": True, "curvature": 0.3, "x_offset": 0.0},
     "fc_s0": {"color": "#1F3C7A", "linewidth": 1.2, "label_text": "S0", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.0, "k_factor": 1.0},
     "fc_s1": {"color": "#3D71CC", "linewidth": 1.2, "label_text": "S1", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.5, "k_factor": 1.0},
     "fc_t1": {"color": "#E08A2D", "linewidth": 1.2, "label_text": "T1", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.3, "k_factor": 1.0},
@@ -398,11 +401,11 @@ COLORBLIND_STYLE: DiagramStyle = {
         "fontsize": 9,
         "frameon": True,
     },
-    "s0": {"color": "#0072B2", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#0072B2", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#0072B2"},
-    "s1": {"color": "#D55E00", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#D55E00", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#D55E00"},
-    "t1": {"color": "#009E73", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#009E73", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#009E73"},
-    "absorption_arrow": {"color": "#333333", "linewidth": 1.5, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 9, "label_color": "#333333", "show_label": True},
-    "isc_curve": {"color": "#555555", "linewidth": 1.2, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 9, "label_color": "#555555", "show_label": True, "curvature": 0.3},
+    "s0": {"color": "#0072B2", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#0072B2", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#0072B2", "label_offset_below": 14},
+    "s1": {"color": "#D55E00", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#D55E00", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#D55E00", "label_offset_below": 14},
+    "t1": {"color": "#009E73", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#009E73", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#009E73", "label_offset_below": 14},
+    "absorption_arrow": {"color": "#333333", "linewidth": 1.5, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 9, "label_color": "#333333", "show_label": True, "x_offset": 0.0},
+    "isc_curve": {"color": "#555555", "linewidth": 1.2, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 9, "label_color": "#555555", "show_label": True, "curvature": 0.3, "x_offset": 0.0},
     "fc_s0": {"color": "#0072B2", "linewidth": 1.8, "label_text": "S0", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.0, "k_factor": 1.0},
     "fc_s1": {"color": "#56B4E9", "linewidth": 1.8, "label_text": "S1", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.5, "k_factor": 1.0},
     "fc_t1": {"color": "#D55E00", "linewidth": 1.8, "label_text": "T1", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.3, "k_factor": 1.0},
@@ -473,11 +476,11 @@ GRAYSCALE_STYLE: DiagramStyle = {
         "fontsize": 8,
         "frameon": False,
     },
-    "s0": {"color": "#000000", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#000000", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#000000"},
-    "s1": {"color": "#333333", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#333333", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#333333"},
-    "t1": {"color": "#666666", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#666666", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#666666"},
-    "absorption_arrow": {"color": "#000000", "linewidth": 1.0, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 8, "label_color": "#000000", "show_label": True},
-    "isc_curve": {"color": "#333333", "linewidth": 0.75, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 8, "label_color": "#333333", "show_label": True, "curvature": 0.3},
+    "s0": {"color": "#000000", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#000000", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#000000", "label_offset_below": 14},
+    "s1": {"color": "#333333", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#333333", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#333333", "label_offset_below": 14},
+    "t1": {"color": "#666666", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#666666", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#666666", "label_offset_below": 14},
+    "absorption_arrow": {"color": "#000000", "linewidth": 1.0, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 8, "label_color": "#000000", "show_label": True, "x_offset": 0.0},
+    "isc_curve": {"color": "#333333", "linewidth": 0.75, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 8, "label_color": "#333333", "show_label": True, "curvature": 0.3, "x_offset": 0.0},
     "fc_s0": {"color": "#000000", "linewidth": 1.5, "label_text": "S0", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.0, "k_factor": 1.0},
     "fc_s1": {"color": "#444444", "linewidth": 1.5, "label_text": "S1", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.5, "k_factor": 1.0},
     "fc_t1": {"color": "#888888", "linewidth": 1.5, "label_text": "T1", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.3, "k_factor": 1.0},

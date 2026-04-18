@@ -107,6 +107,7 @@ class FranckCondonPlotter:
         """
         style = validate_style_fonts(style)
         artists: dict = {}
+        artists_by_id: dict = {}
 
         data = self._collect_data(compound_fc_rows, unit)
 
@@ -126,14 +127,20 @@ class FranckCondonPlotter:
         artists["vib_levels"] = self._draw_vib_levels(ax, style, data)
         artists["wavefunctions"] = self._draw_wavefunctions(ax, style, data)
         artists["transitions"] = self._draw_transitions(ax, style, data)
-        artists["isc"] = self._draw_isc(ax, style, data)
+        artists["isc"] = self._draw_isc(ax, style, data, artists_by_id)
         artists["guides"] = self._draw_guides(ax, style, data)
-        artists["state_labels"] = self._draw_state_labels(ax, style, data)
+        artists["state_labels"] = self._draw_state_labels(ax, style, data, artists_by_id)
         artists["energy_labels"] = self._draw_energy_labels(
-            ax, style, data, unit
+            ax, style, data, unit, artists_by_id
         )
         self._draw_energy_axis_indicator(ax, style)
 
+        # Apply any user-dragged label position overrides
+        for label_id, pos in style.get("label_overrides", {}).items():
+            if label_id in artists_by_id:
+                artists_by_id[label_id].set_position(tuple(pos))
+
+        artists["by_id"] = artists_by_id
         return artists
 
     # ------------------------------------------------------------------
@@ -294,7 +301,7 @@ class FranckCondonPlotter:
 
         return out
 
-    def _draw_isc(self, ax: Axes, style: dict, data: dict) -> dict:
+    def _draw_isc(self, ax: Axes, style: dict, data: dict, artists_by_id: dict = None) -> dict:
         """Curved dashed arrow from S1 minimum (left) to T1 minimum (right)."""
         out: dict = {}
         if "S1" not in data["states"] or "T1" not in data["states"]:
@@ -336,6 +343,8 @@ class FranckCondonPlotter:
                 zorder=6,
             )
             out["label"] = t
+            if artists_by_id is not None:
+                artists_by_id["fc_isc_label"] = t
 
         return out
 
@@ -377,7 +386,9 @@ class FranckCondonPlotter:
     # Text labels
     # ------------------------------------------------------------------
 
-    def _draw_state_labels(self, ax: Axes, style: dict, data: dict) -> dict:
+    def _draw_state_labels(
+        self, ax: Axes, style: dict, data: dict, artists_by_id: dict = None
+    ) -> dict:
         out: dict = {}
         label_x = _R_PLOT_MAX + 0.03
         for state in ("S0", "T1", "S1"):
@@ -398,6 +409,8 @@ class FranckCondonPlotter:
                 zorder=4,
             )
             out[state] = t
+            if artists_by_id is not None:
+                artists_by_id[f"fc_{state.lower()}_label"] = t
         return out
 
     @staticmethod
@@ -409,7 +422,8 @@ class FranckCondonPlotter:
         }[state]
 
     def _draw_energy_labels(
-        self, ax: Axes, style: dict, data: dict, unit: str
+        self, ax: Axes, style: dict, data: dict, unit: str,
+        artists_by_id: dict = None,
     ) -> dict:
         out: dict = {}
         decimals = 2 if unit == "eV" else 1
@@ -433,10 +447,10 @@ class FranckCondonPlotter:
                 zorder=6, bbox=bbox,
             )
             out["s1_vert"] = t
+            if artists_by_id is not None:
+                artists_by_id["fc_s1_vert"] = t
 
-        # S1 ad: place to the right of S1 minimum. With new layout S1 is
-        # at r=0.30, so there's comfortable space between S1 and T1 wells
-        # where the ISC label also sits. Place label slightly below ISC.
+        # S1 ad: place to the right of S1 minimum.
         if "S1" in states and states["S1"]["e_ad"] is not None:
             s = style.get("fc_s1", {})
             color = s.get("color", "#3A5FCD")
@@ -449,8 +463,10 @@ class FranckCondonPlotter:
                 zorder=6, bbox=bbox,
             )
             out["s1_ad"] = t
+            if artists_by_id is not None:
+                artists_by_id["fc_s1_ad"] = t
 
-        # T1 ad: T1 now at r=0.55 with room on its right — comfortable layout
+        # T1 ad: T1 now at r=0.55 with room on its right.
         if "T1" in states and states["T1"]["e_ad"] is not None:
             s = style.get("fc_t1", {})
             color = s.get("color", "#2E8B57")
@@ -463,6 +479,8 @@ class FranckCondonPlotter:
                 zorder=6, bbox=bbox,
             )
             out["t1_ad"] = t
+            if artists_by_id is not None:
+                artists_by_id["fc_t1_ad"] = t
 
         return out
 

@@ -82,18 +82,33 @@ class HomoLumoPlotter:
             "lumo_texts": [],
             "gap_texts": [],
         }
+        artists_by_id: dict[str, Any] = {}
 
         homo_s = style["homo"]
         lumo_s = style["lumo"]
         gap_s = style["gap_arrow"]
         lbl_s = style["compound_labels"]
 
+        # Compute y-gap for value label offset in data coordinates
+        all_y = [c.homo for c in compounds] + [c.lumo for c in compounds]
+        y_range = max(all_y) - min(all_y)
+        y_gap = max(y_range * 0.04, 0.08)
+
         for i, compound in enumerate(compounds):
-            self._draw_compound(ax, i, compound, homo_s, lumo_s, gap_s, lbl_s, artists)
+            self._draw_compound(
+                ax, i, compound, homo_s, lumo_s, gap_s, lbl_s,
+                artists, artists_by_id, y_gap,
+            )
 
         self._apply_axes_style(ax, compounds, style)
         self._apply_legend(ax, homo_s, lumo_s, style["legend"])
 
+        # Apply any user-dragged label position overrides
+        for label_id, pos in style.get("label_overrides", {}).items():
+            if label_id in artists_by_id:
+                artists_by_id[label_id].set_position(tuple(pos))
+
+        artists["by_id"] = artists_by_id
         return artists
 
     def update_style(self, style: DiagramStyle) -> None:
@@ -121,6 +136,8 @@ class HomoLumoPlotter:
         gap_s: dict[str, Any],
         lbl_s: dict[str, Any],
         artists: dict[str, list[Any]],
+        artists_by_id: dict[str, Any],
+        y_gap: float,
     ) -> None:
         x_left = i - _HALF_WIDTH
         x_right = i + _HALF_WIDTH
@@ -145,36 +162,33 @@ class HomoLumoPlotter:
         )
         artists["lumo_lines"].append(lumo_line)
 
-        # HOMO value annotation — below the line, offset in points for
-        # consistent breathing room regardless of y-axis scale.
-        homo_text = ax.annotate(
+        # HOMO value text — below the line (draggable, so ax.text not annotate)
+        homo_text = ax.text(
+            i, compound.homo - y_gap,
             homo_s["value_format"].format(compound.homo),
-            xy=(i, compound.homo),
-            xytext=(0, homo_s.get("value_offset_points", -8)),
-            textcoords="offset points",
             ha="center",
             va="top",
             fontsize=homo_s["value_fontsize"],
             color=homo_s["value_color"],
             fontfamily=lbl_s["fontfamily"],
-            annotation_clip=False,
+            clip_on=False,
         )
         artists["homo_texts"].append(homo_text)
+        artists_by_id[f"homo_value_{i}"] = homo_text
 
-        # LUMO value annotation — above the line
-        lumo_text = ax.annotate(
+        # LUMO value text — above the line
+        lumo_text = ax.text(
+            i, compound.lumo + y_gap,
             lumo_s["value_format"].format(compound.lumo),
-            xy=(i, compound.lumo),
-            xytext=(0, lumo_s.get("value_offset_points", 8)),
-            textcoords="offset points",
             ha="center",
             va="bottom",
             fontsize=lumo_s["value_fontsize"],
             color=lumo_s["value_color"],
             fontfamily=lbl_s["fontfamily"],
-            annotation_clip=False,
+            clip_on=False,
         )
         artists["lumo_texts"].append(lumo_text)
+        artists_by_id[f"lumo_value_{i}"] = lumo_text
 
         # Double-headed gap arrow
         arrow = ax.annotate(
@@ -189,7 +203,7 @@ class HomoLumoPlotter:
         )
         artists["arrows"].append(arrow)
 
-        # Gap value label — midpoint, offset right
+        # Gap value label — midpoint, offset right (draggable)
         mid_y = (compound.homo + compound.lumo) / 2.0
         gap_text = ax.text(
             i + _GAP_TEXT_OFFSET,
@@ -200,8 +214,10 @@ class HomoLumoPlotter:
             fontsize=gap_s["fontsize"],
             color=gap_s["color"],
             fontfamily=lbl_s["fontfamily"],
+            clip_on=False,
         )
         artists["gap_texts"].append(gap_text)
+        artists_by_id[f"gap_{i}"] = gap_text
 
     def _apply_axes_style(
         self,

@@ -406,6 +406,18 @@ class StylePanel(QWidget):
         )
         form.addRow("Label font size:", label_fs_spin)
 
+        label_offset_below_spin = QSpinBox()
+        label_offset_below_spin.setRange(-30, 30)
+        label_offset_below_spin.setSingleStep(1)
+        label_offset_below_spin.setSuffix(" pt")
+        label_offset_below_spin.setToolTip(
+            "Distance of state name label below the line in typographic points."
+        )
+        label_offset_below_spin.valueChanged.connect(
+            lambda v, lv=level: self._on_state_label_offset_below_changed(lv, v)
+        )
+        form.addRow("Label offset below:", label_offset_below_spin)
+
         self._state_controls[level] = {
             "color_btn": color_btn,
             "lw_spin": lw_spin,
@@ -413,6 +425,7 @@ class StylePanel(QWidget):
             "offset_spin": offset_spin,
             "label_text_edit": label_text_edit,
             "label_fs_spin": label_fs_spin,
+            "label_offset_below_spin": label_offset_below_spin,
         }
 
         return w
@@ -443,6 +456,16 @@ class StylePanel(QWidget):
         self._abs_label_fs_spin.setRange(6, 16)
         self._abs_label_fs_spin.valueChanged.connect(self._on_abs_label_fs_changed)
         form.addRow("Label font size:", self._abs_label_fs_spin)
+
+        self._abs_x_offset_spin = QDoubleSpinBox()
+        self._abs_x_offset_spin.setRange(-0.5, 0.5)
+        self._abs_x_offset_spin.setSingleStep(0.025)
+        self._abs_x_offset_spin.setDecimals(3)
+        self._abs_x_offset_spin.setToolTip(
+            "Horizontal offset applied uniformly to all absorption arrows."
+        )
+        self._abs_x_offset_spin.valueChanged.connect(self._on_abs_x_offset_changed)
+        form.addRow("Horizontal offset:", self._abs_x_offset_spin)
 
         return w
 
@@ -480,6 +503,16 @@ class StylePanel(QWidget):
         self._isc_curvature_spin.setValue(0.3)
         self._isc_curvature_spin.valueChanged.connect(self._on_isc_curvature_changed)
         form.addRow("Curvature:", self._isc_curvature_spin)
+
+        self._isc_x_offset_spin = QDoubleSpinBox()
+        self._isc_x_offset_spin.setRange(-0.5, 0.5)
+        self._isc_x_offset_spin.setSingleStep(0.025)
+        self._isc_x_offset_spin.setDecimals(3)
+        self._isc_x_offset_spin.setToolTip(
+            "Horizontal offset applied uniformly to all ISC curves."
+        )
+        self._isc_x_offset_spin.valueChanged.connect(self._on_isc_x_offset_changed)
+        form.addRow("Horizontal offset:", self._isc_x_offset_spin)
 
         return w
 
@@ -656,6 +689,7 @@ class StylePanel(QWidget):
 
     def _build_bottom_buttons(self, layout: QVBoxLayout) -> None:
         for label, slot in [
+            ("Reset label positions", self._reset_label_positions),
             ("Reset to Default", self._reset_to_default),
             ("Export Style as JSON…", self._export_style),
             ("Import Style from JSON…", self._import_style),
@@ -705,7 +739,11 @@ class StylePanel(QWidget):
         """Update all controls from *style* without emitting signals."""
         self._updating = True
         try:
+            # Preserve label overrides if the incoming style has none
+            old_overrides = self._current_style.get("label_overrides", {})
             self._current_style = copy.deepcopy(style)
+            if "label_overrides" not in style and old_overrides:
+                self._current_style["label_overrides"] = old_overrides
 
             requested_font = style["title"]["fontfamily"]
             if requested_font not in _PUBLICATION_FONTS or not _is_font_available(requested_font):
@@ -764,6 +802,7 @@ class StylePanel(QWidget):
                 ctrl["offset_spin"].setValue(level_s.get("value_offset_points", 10))
                 ctrl["label_text_edit"].setText(level_s.get("label_text", level.upper()))
                 ctrl["label_fs_spin"].setValue(level_s.get("label_fontsize", 10))
+                ctrl["label_offset_below_spin"].setValue(level_s.get("label_offset_below", 14))
 
             abs_s = style.get("absorption_arrow", {})  # type: ignore[call-overload]
             if abs_s:
@@ -772,6 +811,7 @@ class StylePanel(QWidget):
                 self._abs_show_label_cb.setChecked(abs_s.get("show_label", True))
                 self._abs_label_edit.setText(abs_s.get("label_text", "Abs."))
                 self._abs_label_fs_spin.setValue(abs_s.get("label_fontsize", 9))
+                self._abs_x_offset_spin.setValue(abs_s.get("x_offset", 0.0))
 
             isc_s = style.get("isc_curve", {})  # type: ignore[call-overload]
             if isc_s:
@@ -781,6 +821,7 @@ class StylePanel(QWidget):
                 self._isc_label_edit.setText(isc_s.get("label_text", "ISC"))
                 self._isc_label_fs_spin.setValue(isc_s.get("label_fontsize", 9))
                 self._isc_curvature_spin.setValue(isc_s.get("curvature", 0.3))
+                self._isc_x_offset_spin.setValue(isc_s.get("x_offset", 0.0))
 
             # FC curves
             for fc_level in ("fc_s0", "fc_s1", "fc_t1"):
@@ -1000,6 +1041,12 @@ class StylePanel(QWidget):
         self._current_style[level]["label_fontsize"] = value  # type: ignore[index]
         self._schedule_emit()
 
+    def _on_state_label_offset_below_changed(self, level: str, value: int) -> None:
+        if self._updating:
+            return
+        self._current_style[level]["label_offset_below"] = value  # type: ignore[index]
+        self._schedule_emit()
+
     # Absorption arrow slots
 
     def _on_abs_lw_changed(self, value: float) -> None:
@@ -1024,6 +1071,12 @@ class StylePanel(QWidget):
         if self._updating:
             return
         self._current_style["absorption_arrow"]["label_fontsize"] = value
+        self._schedule_emit()
+
+    def _on_abs_x_offset_changed(self, value: float) -> None:
+        if self._updating:
+            return
+        self._current_style["absorption_arrow"]["x_offset"] = value
         self._schedule_emit()
 
     # ISC curve slots
@@ -1056,6 +1109,12 @@ class StylePanel(QWidget):
         if self._updating:
             return
         self._current_style["isc_curve"]["curvature"] = value
+        self._schedule_emit()
+
+    def _on_isc_x_offset_changed(self, value: float) -> None:
+        if self._updating:
+            return
+        self._current_style["isc_curve"]["x_offset"] = value
         self._schedule_emit()
 
     # ------------------------------------------------------------------
@@ -1334,6 +1393,10 @@ class StylePanel(QWidget):
         except KeyError:
             return
         self.set_style(style)
+        self._emit_style_changed()
+
+    def _reset_label_positions(self) -> None:
+        self._current_style.pop("label_overrides", None)
         self._emit_style_changed()
 
     def _reset_to_default(self) -> None:
