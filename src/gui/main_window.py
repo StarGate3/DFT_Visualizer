@@ -27,6 +27,7 @@ from src.gui.diagram_widgets.homo_lumo_diagram import HomoLumoDiagramWidget
 from src.gui.diagram_widgets.state_diagram import StateDiagramWidget
 from src.gui.export_dialog import ExportDialog
 from src.gui.history_manager import AppSnapshot, HistoryManager
+from src.gui.theory_dialog import TheoryDialog
 from src.gui.style_panel import StylePanel
 from src.plotting.style_presets import DEFAULT_STYLE
 
@@ -51,6 +52,7 @@ class MainWindow(QMainWindow):
         self._dirty: bool = False
         self._applying_snapshot: bool = False
         self._history = HistoryManager()
+        self._theory_dialog: TheoryDialog | None = None
 
         self._setup_window()
         self._build_menu_bar()
@@ -214,6 +216,14 @@ class MainWindow(QMainWindow):
 
     def _build_help_menu(self, menu_bar: object) -> None:
         help_menu: QMenu = menu_bar.addMenu("&Help")  # type: ignore[attr-defined]
+
+        theory_action = QAction("&Theory...", self)
+        theory_action.setShortcut("Ctrl+T")
+        theory_action.setStatusTip("Show theoretical background for the diagrams")
+        theory_action.triggered.connect(self._show_theory_dialog)
+        help_menu.addAction(theory_action)
+
+        help_menu.addSeparator()
 
         about_action = QAction("&About", self)
         about_action.setShortcut("F1")
@@ -620,9 +630,46 @@ class MainWindow(QMainWindow):
     # Misc
     # ------------------------------------------------------------------
 
+    def _show_theory_dialog(self) -> None:
+        """Open the Theory reference window. If already open, raise it."""
+        if self._theory_dialog is None:
+            self._theory_dialog = TheoryDialog(self)
+        self._theory_dialog.show()
+        self._theory_dialog.raise_()
+        self._theory_dialog.activateWindow()
+
     def _show_about(self) -> None:
-        QMessageBox.information(
-            self,
-            "About DFT Visualizer",
-            "DFT Visualizer v0.1.0\n\nPublication-quality DFT diagram tool.",
-        )
+        about_html = """
+        <h2>DFT Visualizer</h2>
+        <p><b>Version:</b> 1.0.0</p>
+        <p>
+        Publication-quality visualization tool for Density Functional
+        Theory (DFT) and TD-DFT computational chemistry results.
+        </p>
+        <p>
+        Generates three types of diagrams: HOMO/LUMO, electronic states
+        (S<sub>0</sub>/S<sub>1</sub>/T<sub>1</sub>), and Franck-Condon
+        schematic.
+        </p>
+        <p>
+        <b>Author:</b> StarGate3<br>
+        <b>GitHub:</b> <a href="https://github.com/StarGate3">
+        https://github.com/StarGate3</a><br>
+        <b>Repository:</b> <a href="https://github.com/StarGate3/DFT_Visualizer">
+        https://github.com/StarGate3/DFT_Visualizer</a>
+        </p>
+        <p>
+        <b>License:</b> MIT License
+        </p>
+        <p style="color: gray;">
+        <small>Built with PyQt6 and matplotlib.</small>
+        </p>
+        """
+
+        msg = QMessageBox(self)
+        msg.setWindowTitle("About DFT Visualizer")
+        msg.setTextFormat(Qt.TextFormat.RichText)
+        msg.setText(about_html)
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
+        msg.exec()
