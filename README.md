@@ -17,22 +17,20 @@ chemistry and photochemistry.
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.11 (via Conda)
 - See `requirements.txt` for library versions
 
 ## Installation
 
 ```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-
-# Linux / macOS
-python3 -m venv venv
-source venv/bin/activate
+conda create -n dft-viz python=3.11 -y
+conda activate dft-viz
 pip install -r requirements.txt
 ```
+
+> **Windows note:** On systems with Anaconda/Miniconda, using a Conda environment avoids
+> common DLL loading issues with PyQt6 that can occur when mixing venv with the Conda base
+> environment.
 
 ## Usage
 
