@@ -1,12 +1,12 @@
-"""Theory dialog — wyświetla merytoryczne wyjaśnienia diagramów DFT.
+"""Theory dialog — displays theoretical explanations of DFT diagrams.
 
-Okno ma dwa panele:
-- Lewy: lista sekcji (QListWidget) do nawigacji
-- Prawy: obszar tekstowy (QTextBrowser) z bogatym HTML
+The window has two panels:
+- Left: section list (QListWidget) for navigation
+- Right: text area (QTextBrowser) with rich HTML
 
-Wybór sekcji z lewej strony aktualizuje treść po prawej. Okno
-nie jest modalne — można go zostawić otwarte obok głównej aplikacji
-podczas analizy diagramów.
+Selecting a section on the left updates the content on the right.
+The window is non-modal — the user can keep it open next to the main
+application while analyzing diagrams.
 """
 
 from __future__ import annotations
@@ -30,23 +30,23 @@ from src.gui.theory_content import THEORY_SECTIONS
 
 
 class TheoryDialog(QDialog):
-    """Niemodalne okno z teorią diagramów DFT.
+    """Non-modal window with theoretical background for DFT diagrams.
 
-    Okno pamięta ostatnio oglądaną sekcję pomiędzy otwarciami
-    (zmienna klasowa _last_section). Otwiera się domyślnie z rozmiarem
-    900x650 ale jest w pełni skalowalne.
+    The window remembers the last-viewed section between openings
+    (class-level _last_section variable). Default size 900x650 but
+    fully resizable.
     """
 
-    # Zapamiętuje ostatnio wybraną sekcję między otwarciami okna
+    # Remembers the last-selected section between window openings
     _last_section: str = "overview"
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Teoria diagramów — DFT Visualizer")
+        self.setWindowTitle("Theory — DFT Visualizer")
         self.resize(900, 650)
         self.setMinimumSize(QSize(650, 400))
 
-        # Niemodalne okno — użytkownik może wrócić do głównej aplikacji
+        # Non-modal — user can return to the main application
         self.setModal(False)
 
         self._setup_ui()
@@ -62,34 +62,34 @@ class TheoryDialog(QDialog):
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(8)
 
-        # Górny wiersz: dwa panele obok siebie
+        # Top row: two panels side by side
         content_row = QHBoxLayout()
         content_row.setSpacing(10)
 
-        # Lewy panel — lista sekcji
+        # Left panel — section list
         self._section_list = QListWidget()
         self._section_list.setFixedWidth(220)
         self._section_list.setFont(QFont("", 10))
         self._section_list.currentItemChanged.connect(self._on_section_selected)
         content_row.addWidget(self._section_list)
 
-        # Prawy panel — treść HTML
+        # Right panel — HTML content
         self._content_view = QTextBrowser()
         self._content_view.setOpenExternalLinks(True)
         # Preferred internal font for readability
         content_font = QFont("Arial", 11)
         self._content_view.setFont(content_font)
-        # Trochę marginesu w środku dla wygody czytania
+        # Small internal margin for comfortable reading
         self._content_view.document().setDocumentMargin(12)
         content_row.addWidget(self._content_view, 1)
 
         main_layout.addLayout(content_row, 1)
 
-        # Dolny pasek z przyciskiem zamknięcia
+        # Bottom bar with Close button
         button_row = QHBoxLayout()
         button_row.addStretch(1)
 
-        close_btn = QPushButton("Zamknij")
+        close_btn = QPushButton("Close")
         close_btn.setFixedWidth(100)
         close_btn.setDefault(True)
         close_btn.clicked.connect(self.close)
@@ -102,22 +102,22 @@ class TheoryDialog(QDialog):
     # ------------------------------------------------------------------
 
     def _populate_sections(self) -> None:
-        """Wypełnia listę sekcji na podstawie THEORY_SECTIONS."""
+        """Populate the section list from THEORY_SECTIONS."""
         for key, (display_name, _html) in THEORY_SECTIONS.items():
             item = QListWidgetItem(display_name)
-            # Przechowujemy klucz sekcji w Qt.ItemDataRole.UserRole
+            # Store the section key in Qt.ItemDataRole.UserRole
             item.setData(Qt.ItemDataRole.UserRole, key)
             self._section_list.addItem(item)
 
     def _restore_last_section(self) -> None:
-        """Ustawia sekcję zapamiętaną z poprzedniego otwarcia okna."""
+        """Select the section remembered from the previous opening."""
         target_key = TheoryDialog._last_section
         for i in range(self._section_list.count()):
             item = self._section_list.item(i)
             if item.data(Qt.ItemDataRole.UserRole) == target_key:
                 self._section_list.setCurrentRow(i)
                 return
-        # Fallback: pierwszy element
+        # Fallback: first entry
         if self._section_list.count() > 0:
             self._section_list.setCurrentRow(0)
 
@@ -126,12 +126,12 @@ class TheoryDialog(QDialog):
         current: Optional[QListWidgetItem],
         previous: Optional[QListWidgetItem],  # noqa: ARG002 — unused but required by signal
     ) -> None:
-        """Ładuje HTML dla wybranej sekcji do prawego panelu."""
+        """Load HTML for the selected section into the right panel."""
         if current is None:
             return
         key = current.data(Qt.ItemDataRole.UserRole)
         if key in THEORY_SECTIONS:
             _display_name, html = THEORY_SECTIONS[key]
             self._content_view.setHtml(html)
-            # Zapamiętaj wybór dla następnego otwarcia
+            # Remember this selection for next opening
             TheoryDialog._last_section = key

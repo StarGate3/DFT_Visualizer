@@ -1,379 +1,374 @@
-"""Merytoryczna zawartość okna 'Theory' (polski, średni poziom szczegółowości).
+"""Theoretical content for the 'Theory' window (English, medium detail level).
 
-Treść skierowana do studentów magisterskich / doktorantów pierwszego roku
-pracujących z obliczeniami DFT/TD-DFT. Cel: czytelnik po 5 minutach
-rozumie co przedstawia każdy z trzech diagramów i dlaczego dany element
-wygląda tak, a nie inaczej.
+Content aimed at master's / early-PhD students working with DFT/TD-DFT
+calculations. Goal: after 5 minutes of reading, the user understands
+what each of the three diagrams shows and why any given element looks
+the way it does.
 
-Używamy HTML z matplotlib-style MathJax/LaTeX (Qt rich text text obsługuje
-prosty HTML + subset CSS).
+Uses HTML with subset supported by Qt's QTextBrowser (basic HTML + CSS).
 """
 
 from __future__ import annotations
 
 
 # ---------------------------------------------------------------------------
-# Sekcja 1: HOMO/LUMO
+# Section 1: HOMO/LUMO
 # ---------------------------------------------------------------------------
 
 HOMO_LUMO_HTML = """
-<h2>🔴 Diagram HOMO/LUMO</h2>
+<h2>🔴 HOMO/LUMO Diagram</h2>
 
-<h3>Co przedstawia diagram?</h3>
+<h3>What does the diagram show?</h3>
 <p>
-Diagram <b>HOMO/LUMO</b> pokazuje energie dwóch najważniejszych orbitali
-molekularnych:
+The <b>HOMO/LUMO</b> diagram displays the energies of the two most
+important frontier molecular orbitals:
 </p>
 <ul>
-  <li><b>HOMO</b> (<i>Highest Occupied Molecular Orbital</i>) — najwyższy
-      obsadzony orbital molekularny. To "szczyt" zapełnionej części
-      struktury elektronowej cząsteczki.</li>
-  <li><b>LUMO</b> (<i>Lowest Unoccupied Molecular Orbital</i>) — najniższy
-      nieobsadzony orbital molekularny. To pierwszy "wolny" orbital
-      do którego może być wzbudzony elektron.</li>
+  <li><b>HOMO</b> (<i>Highest Occupied Molecular Orbital</i>) — the
+      highest-energy orbital that still holds electrons. It represents
+      the "top" of the occupied electronic structure of the molecule.</li>
+  <li><b>LUMO</b> (<i>Lowest Unoccupied Molecular Orbital</i>) — the
+      lowest-energy orbital with no electrons. It is the first "free"
+      orbital available to accept an excited electron.</li>
 </ul>
 
-<h3>Dlaczego te dwa orbitale są ważne?</h3>
+<h3>Why are these two orbitals important?</h3>
 <p>
-HOMO i LUMO definiują <b>reaktywność chemiczną</b> cząsteczki:
+HOMO and LUMO define the <b>chemical reactivity</b> of the molecule:
 </p>
 <ul>
-  <li>Energia HOMO jest miarą zdolności do <b>oddawania elektronów</b>
-      (potencjał jonizacji, ~IP). Wyższe HOMO = łatwiejsze utlenianie.</li>
-  <li>Energia LUMO opisuje zdolność do <b>przyjmowania elektronów</b>
-      (powinowactwo elektronowe, ~EA). Niższe LUMO = łatwiejsza redukcja.</li>
-  <li><b>Różnica energii LUMO − HOMO</b>, zwana <b>przerwą HOMO/LUMO</b>
-      (<i>gap</i>), jest pierwszym przybliżeniem energii przejścia
-      elektronowego i optycznego.</li>
+  <li>The HOMO energy indicates the ability to <b>donate electrons</b>
+      (ionization potential, ~IP). Higher HOMO = easier oxidation.</li>
+  <li>The LUMO energy describes the ability to <b>accept electrons</b>
+      (electron affinity, ~EA). Lower LUMO = easier reduction.</li>
+  <li>The <b>LUMO − HOMO</b> energy difference, known as the
+      <b>HOMO/LUMO gap</b>, is a first approximation of the electronic
+      and optical excitation energy.</li>
 </ul>
 
-<h3>Elementy diagramu</h3>
+<h3>Elements of the diagram</h3>
 <ul>
-  <li><b>Czerwone linie poziome</b> — poziomy HOMO dla każdej cząsteczki
-      (kolor konfigurowalny).</li>
-  <li><b>Niebieskie linie poziome</b> — poziomy LUMO.</li>
-  <li><b>Pionowa strzałka z wartością</b> — wielkość przerwy HOMO/LUMO,
-      zwykle w eV.</li>
-  <li><b>Wartości liczbowe obok linii</b> — energie orbitali w eV
-      (wartości ujemne, bo energia odnosi się do poziomu próżni).</li>
+  <li><b>Red horizontal lines</b> — HOMO levels for each molecule
+      (color is configurable).</li>
+  <li><b>Blue horizontal lines</b> — LUMO levels.</li>
+  <li><b>Vertical arrow with value</b> — magnitude of the HOMO/LUMO
+      gap, usually in eV.</li>
+  <li><b>Numeric values beside each line</b> — orbital energies in eV
+      (negative values — energies are referenced to the vacuum level).</li>
 </ul>
 
-<h3>Interpretacja praktyczna</h3>
+<h3>Practical interpretation</h3>
 <p>
-Cząsteczki o <b>małej przerwie HOMO/LUMO</b> są na ogół:
+Molecules with a <b>small HOMO/LUMO gap</b> tend to be:
 </p>
 <ul>
-  <li>Bardziej reaktywne fotochemicznie.</li>
-  <li>Absorbują światło o dłuższych falach (przesunięcie batochromowe).</li>
-  <li>Częściej używane jako chromofory/barwniki organiczne.</li>
+  <li>More photochemically reactive.</li>
+  <li>Absorbers of longer-wavelength light (bathochromic shift).</li>
+  <li>Commonly used as chromophores and organic dyes.</li>
 </ul>
 <p>
-Cząsteczki o <b>dużej przerwie</b> są zwykle stabilne, bezbarwne
-i mniej reaktywne.
+Molecules with a <b>large gap</b> tend to be stable, colorless, and
+less reactive.
 </p>
 
-<h3>⚠️ Uwaga metodologiczna</h3>
+<h3>⚠️ Methodological note</h3>
 <p>
-Energia HOMO i LUMO obliczona metodą <b>DFT</b> (np. B3LYP) jest
-<b>tylko przybliżeniem</b> prawdziwych energii orbitali Kohna-Shama.
-Dokładne wartości IP i EA wymagają osobnych obliczeń (Δ-SCF lub
-metody Greena). Przerwa HOMO/LUMO w DFT zwykle zaniża rzeczywistą
-przerwę optyczną o 30–50%.
+HOMO and LUMO energies computed with <b>DFT</b> (e.g., B3LYP) are
+<b>only approximations</b> of the true Kohn-Sham orbital energies.
+Accurate values of IP and EA require separate calculations (Δ-SCF or
+Green's-function methods). DFT typically <b>underestimates</b> the true
+optical gap by 30–50%.
 </p>
 """
 
 
 # ---------------------------------------------------------------------------
-# Sekcja 2: Stany elektronowe S0/S1/T1
+# Section 2: Electronic states S0/S1/T1
 # ---------------------------------------------------------------------------
 
 STATES_HTML = """
-<h2>🟢 Diagram stanów elektronowych S₀/S₁/T₁</h2>
+<h2>🟢 Electronic State Diagram (S₀/S₁/T₁)</h2>
 
-<h3>Co przedstawia diagram?</h3>
+<h3>What does the diagram show?</h3>
 <p>
-Ten diagram pokazuje <b>energie stanów elektronowych</b> cząsteczki,
-obliczone zwykle metodą <b>TD-DFT</b> (<i>Time-Dependent Density
+This diagram shows the <b>energies of electronic states</b> of the
+molecule, usually obtained from <b>TD-DFT</b> (<i>Time-Dependent Density
 Functional Theory</i>):
 </p>
 <ul>
-  <li><b>S₀</b> — <b>stan podstawowy singletowy</b> (ground singlet state).
-      Wszystkie elektrony sparowane, spin całkowity = 0.
-      Punkt odniesienia (E = 0).</li>
-  <li><b>S₁</b> — <b>pierwszy wzbudzony stan singletowy</b>.
-      Jeden elektron przeniesiony na wyższy orbital, ale ze
-      zachowaniem sparowania spinów (spin ogólny = 0).</li>
-  <li><b>T₁</b> — <b>pierwszy wzbudzony stan trypletowy</b>.
-      Jeden elektron na wyższym orbitalu, ale z
-      <b>rozparowanym spinem</b> (spin całkowity = 1).</li>
+  <li><b>S₀</b> — <b>singlet ground state</b>. All electrons paired,
+      total spin = 0. The reference point (E = 0).</li>
+  <li><b>S₁</b> — <b>first excited singlet state</b>. One electron
+      promoted to a higher orbital, but spins remain paired (total
+      spin = 0).</li>
+  <li><b>T₁</b> — <b>first excited triplet state</b>. One electron at a
+      higher orbital, but with <b>parallel spins</b> (total spin = 1).</li>
 </ul>
 
-<h3>Dlaczego T₁ jest zawsze niżej niż S₁?</h3>
+<h3>Why is T₁ always below S₁?</h3>
 <p>
-To wynika z <b>zasady Hunda dla cząsteczek</b>: dla tej samej
-konfiguracji elektronowej stan trypletowy ma niższą energię niż
-singletowy, ponieważ elektrony o tym samym spinie unikają się w
-przestrzeni (wymiana), co obniża energię odpychania elektronowego.
-Różnica S₁ − T₁ nazywa się <b>rozszczepieniem singlet-tryplet</b>
-(ΔE<sub>ST</sub>) i jest kluczowa w projektowaniu emiterów TADF
-(<i>Thermally Activated Delayed Fluorescence</i>).
+This follows from <b>Hund's rule for molecules</b>: for the same
+electronic configuration, the triplet state has lower energy than the
+singlet because electrons of parallel spin avoid each other in space
+(exchange), reducing the electron-electron repulsion. The S₁ − T₁
+difference is called the <b>singlet-triplet splitting</b>
+(ΔE<sub>ST</sub>) and is crucial in designing TADF (<i>Thermally
+Activated Delayed Fluorescence</i>) emitters.
 </p>
 
-<h3>Elementy diagramu</h3>
+<h3>Elements of the diagram</h3>
 <ul>
-  <li><b>S₀ (granatowa linia)</b> — stan podstawowy, energia = 0.</li>
-  <li><b>T₁ (zielona linia)</b> — stan trypletowy.</li>
-  <li><b>S₁ (bordowa linia)</b> — stan singletowy, zwykle najwyższy
-      z trzech.</li>
-  <li><b>Strzałka "Abs."</b> — absorpcja fotonu (S₀ → S₁).
-      To proces promienisty, zachowujący spin.</li>
-  <li><b>Krzywa przerywana "ISC"</b> — <b>Intersystem Crossing</b>
-      (przejście międzysystemowe) ze stanu S₁ do T₁. Proces
-      <b>bezpromienisty</b>, wymagający sprzężenia spinowo-orbitalnego.</li>
+  <li><b>S₀ (navy blue line)</b> — ground state, energy = 0.</li>
+  <li><b>T₁ (green line)</b> — triplet state.</li>
+  <li><b>S₁ (dark red line)</b> — singlet state, typically the
+      highest of the three.</li>
+  <li><b>"Abs." arrow</b> — photon absorption (S₀ → S₁). A radiative,
+      spin-conserving process.</li>
+  <li><b>"ISC" dashed curve</b> — <b>Intersystem Crossing</b> from S₁
+      to T₁. A <b>non-radiative</b> process requiring spin-orbit
+      coupling.</li>
 </ul>
 
-<h3>Dlaczego ISC jest "zakrzywiona i przerywana"?</h3>
+<h3>Why is ISC "curved and dashed"?</h3>
 <p>
-Linia przerywana podkreśla że ISC jest <b>zabronione spinowo</b>
-(Δs ≠ 0). W cząsteczkach zawierających ciężkie atomy (Br, I, metale)
-sprzężenie spinowo-orbitalne umożliwia ten "zakazany" proces.
-Zakrzywiona trajektoria sugeruje że nie jest to natychmiastowe
-przejście, lecz proces kinetyczny o charakterystycznej stałej szybkości
-k<sub>ISC</sub>.
+The dashed style emphasizes that ISC is <b>spin-forbidden</b>
+(Δs ≠ 0). Molecules containing heavy atoms (Br, I, metals) exhibit
+enhanced spin-orbit coupling that enables this "forbidden" process.
+The curved trajectory conveys that ISC is not instantaneous but a
+kinetic process with a characteristic rate constant k<sub>ISC</sub>.
 </p>
 
-<h3>Interpretacja praktyczna</h3>
+<h3>Practical interpretation</h3>
 <ul>
-  <li><b>Fosforescencja</b> zachodzi z T₁ do S₀ — wymaga wcześniejszego
-      ISC z S₁.</li>
-  <li><b>Fluorescencja</b> zachodzi z S₁ do S₀ — konkuruje z ISC.</li>
-  <li><b>Tlen singletowy</b> (fotosensybilizacja) jest generowany przez
-      cząsteczki o wysokim stopniu zapełnienia T₁ po absorpcji.</li>
+  <li><b>Phosphorescence</b> occurs from T₁ to S₀ — it requires a
+      preceding ISC from S₁.</li>
+  <li><b>Fluorescence</b> occurs from S₁ to S₀ — it competes with ISC.</li>
+  <li><b>Singlet oxygen</b> (photosensitization) is generated by
+      molecules with high T₁ population after absorption.</li>
 </ul>
 
-<h3>⚠️ Uwaga</h3>
+<h3>⚠️ Note</h3>
 <p>
-Energie z TD-DFT zależą <b>silnie</b> od wyboru funkcjonału. Dla
-przejść z transferem ładunku (CT) zalecane są funkcjonały
-zakresowo-poprawione (CAM-B3LYP, ωB97X-D). Dla typowych
-stanów π→π* wystarcza B3LYP lub PBE0.
+TD-DFT state energies depend <b>strongly</b> on the choice of
+functional. For charge-transfer (CT) states, range-separated
+functionals (CAM-B3LYP, ωB97X-D) are recommended. For typical π→π*
+states, B3LYP or PBE0 is sufficient.
 </p>
 """
 
 
 # ---------------------------------------------------------------------------
-# Sekcja 3: Diagram Franck-Condon
+# Section 3: Franck-Condon diagram
 # ---------------------------------------------------------------------------
 
 FRANCK_CONDON_HTML = """
-<h2>🟠 Diagram Franck-Condon</h2>
+<h2>🟠 Franck-Condon Diagram</h2>
 
-<h3>Co przedstawia diagram?</h3>
+<h3>What does the diagram show?</h3>
 <p>
-Diagram Franck-Condon pokazuje <b>powierzchnie energii potencjalnej</b>
-(PES) dwóch lub trzech stanów elektronowych (S₀, T₁, S₁) <b>wzdłuż
-uogólnionej współrzędnej reakcji r</b>. Ilustruje energetykę przejść
-elektronowych w kontekście <b>drgań molekularnych</b>.
+The Franck-Condon diagram displays <b>potential energy surfaces</b>
+(PES) of two or three electronic states (S₀, T₁, S₁) <b>along a
+generalized reaction coordinate r</b>. It visualizes the energetics
+of electronic transitions in the context of <b>molecular vibrations</b>.
 </p>
 <p>
-To <b>najbogatszy informacyjnie diagram</b> w spektroskopii molekularnej
-i fotochemii — łączy energetykę elektronową z dynamiką jądrową.
+This is the <b>most information-rich diagram</b> in molecular
+spectroscopy and photochemistry — it unifies electronic energetics
+with nuclear dynamics.
 </p>
 
-<h3>Kluczowe koncepcje</h3>
+<h3>Key concepts</h3>
 
-<h4>1. Zasada Franck-Condon</h4>
+<h4>1. Franck-Condon principle</h4>
 <p>
-Podczas absorpcji lub emisji fotonu <b>jądra atomowe są znacznie
-wolniejsze od elektronów</b> (zasada Borna-Oppenheimera + duża różnica
-mas). Oznacza to że przejście elektronowe zachodzi <b>przy niezmienionej
-geometrii jądrowej</b> (przejście <i>pionowe</i>, ang. <i>vertical</i>).
+During photon absorption or emission, <b>atomic nuclei are much slower
+than electrons</b> (Born-Oppenheimer approximation + large mass
+difference). As a result, an electronic transition occurs
+<b>at unchanged nuclear geometry</b> (a <i>vertical</i> transition).
 </p>
 <p>
-Na diagramie widać to jako <b>pionową, pełną strzałkę</b> od minimum S₀
-w górę — elektron wchodzi do stanu S₁ w geometrii S₀, która dla S₁
-jest geometrią wysoko-energetyczną (zwykle na ścianie studni, nie w
-minimum).
+On the diagram this manifests as a <b>vertical solid arrow</b> from
+the S₀ minimum upward — the electron enters S₁ at the S₀ geometry,
+which for S₁ is a high-energy geometry (typically on the wall of the
+well, not at its minimum).
 </p>
 
-<h4>2. Różnica energii wertykalnej i adiabatycznej</h4>
+<h4>2. Vertical vs. adiabatic energy</h4>
 <ul>
-  <li><b>E<sub>vertical</sub> (wertykalna)</b> — energia przejścia
-      przy niezmienionej geometrii. To energia absorbowanego fotonu
-      (maksimum pasma absorpcji).</li>
-  <li><b>E<sub>adiabatic</sub> (adiabatyczna)</b> — różnica energii
-      między <b>minimami</b> obu stanów. Każdy stan w swojej
-      zrelaksowanej geometrii.</li>
-  <li>Różnica E<sub>vertical</sub> − E<sub>adiabatic</sub> to
-      <b>energia reorganizacji</b> λ — miara sprzężenia
-      elektron-fonon. Duża λ = silne przesunięcie Stokesa.</li>
+  <li><b>E<sub>vertical</sub></b> — excitation energy at unchanged
+      geometry. It is the absorbed photon energy (absorption band
+      maximum).</li>
+  <li><b>E<sub>adiabatic</sub></b> — energy difference between the
+      <b>minima</b> of both states. Each state at its own relaxed
+      geometry.</li>
+  <li>The difference E<sub>vertical</sub> − E<sub>adiabatic</sub> is
+      the <b>reorganization energy</b> λ — a measure of
+      electron-phonon coupling. Large λ = large Stokes shift.</li>
 </ul>
 
-<h4>3. Relaksacja Kashy</h4>
+<h4>3. Kasha relaxation</h4>
 <p>
-Po absorpcji cząsteczka znajduje się w wysoko-wibracyjnym stanie S₁.
-<b>Szybko</b> (pikosekundy) relaksuje wibracyjnie do minimum S₁
-(zielona strzałka kropkowana w dół). Dalsza fluorescencja zachodzi
-z tego minimum — dlatego widmo emisji nie zależy od długości fali
-wzbudzenia.
+Immediately after absorption the molecule sits in a vibrationally hot
+S₁ state. It then <b>rapidly</b> (picoseconds) relaxes vibrationally
+to the S₁ minimum (green downward dotted arrow). Subsequent
+fluorescence occurs from this minimum — which is why the emission
+spectrum is independent of the excitation wavelength.
 </p>
 
-<h3>Elementy diagramu</h3>
+<h3>Elements of the diagram</h3>
 <ul>
-  <li><b>Trzy krzywe potencjalne</b> (przypominające potencjał Morse'a) —
-      S₀ (dolna), T₁ (środkowa), S₁ (górna). Minima są <b>przesunięte
-      horyzontalnie</b>, bo stany wzbudzone mają inne geometrie
-      równowagowe niż stan podstawowy.</li>
-  <li><b>Poziomy wibracyjne</b> (poziome cienkie linie w studniach) —
-      schematyczne drgania molekularne, ν=0, 1, 2...</li>
-  <li><b>Funkcje falowe</b> (małe garby nad ν=0) — gęstość
-      prawdopodobieństwa znalezienia jąder w stanie ν=0.</li>
-  <li><b>Strzałka pionowa pełna</b> — przejście wertykalne (FC).</li>
-  <li><b>Strzałka przerywana pochyła</b> — przejście adiabatyczne
-      (między minimami).</li>
-  <li><b>Krzywa "ISC"</b> — przejście międzysystemowe S₁ → T₁.</li>
-  <li><b>Etykiety energii</b> — wartości E<sub>vertical</sub> i
-      E<sub>adiabatic</sub> w kcal/mol lub eV.</li>
+  <li><b>Three potential curves</b> (resembling Morse potentials) —
+      S₀ (bottom), T₁ (middle), S₁ (top). Minima are <b>horizontally
+      offset</b>, because the excited states have different equilibrium
+      geometries than the ground state.</li>
+  <li><b>Vibrational levels</b> (thin horizontal lines inside each well)
+      — schematic molecular vibrations, ν=0, 1, 2...</li>
+  <li><b>Wavefunctions</b> (small bumps above ν=0) — probability
+      density of finding the nuclei in the ν=0 state.</li>
+  <li><b>Vertical solid arrow</b> — vertical (FC) transition.</li>
+  <li><b>Inclined dashed arrow</b> — adiabatic transition
+      (between minima).</li>
+  <li><b>"ISC" curve</b> — S₁ → T₁ intersystem crossing.</li>
+  <li><b>Energy labels</b> — values of E<sub>vertical</sub> and
+      E<sub>adiabatic</sub> in kcal/mol or eV.</li>
 </ul>
 
-<h3>Interpretacja praktyczna</h3>
+<h3>Practical interpretation</h3>
 <ul>
-  <li><b>Małe przesunięcie Stokesa</b> (E<sub>vert</sub> ≈ E<sub>ad</sub>):
-      sztywna cząsteczka, wąskie pasma, wysoka wydajność fluorescencji.</li>
-  <li><b>Duże przesunięcie Stokesa</b> (E<sub>vert</sub> − E<sub>ad</sub>
-      &gt; 0.5 eV): elastyczna cząsteczka, szerokie pasma,
-      konkurencja bezpromienista.</li>
-  <li>Jeśli <b>krzywe S₁ i S₀ się przecinają</b>: istnieje
-      <b>stożek przecięcia</b> (conical intersection) — bardzo szybka
-      relaksacja bezpromienista. Cząsteczka zachowuje się jak
-      fotoprzełącznik.</li>
+  <li><b>Small Stokes shift</b> (E<sub>vert</sub> ≈ E<sub>ad</sub>):
+      rigid molecule, narrow bands, high fluorescence quantum yield.</li>
+  <li><b>Large Stokes shift</b> (E<sub>vert</sub> − E<sub>ad</sub>
+      &gt; 0.5 eV): flexible molecule, broad bands, competing
+      non-radiative decay.</li>
+  <li>If <b>S₁ and S₀ curves cross</b>: there is a <b>conical
+      intersection</b> enabling very fast non-radiative relaxation.
+      The molecule behaves like a photoswitch.</li>
 </ul>
 
-<h3>📝 Ważne: ten diagram jest SCHEMATEM</h3>
+<h3>📝 Important: this diagram is a SCHEMATIC</h3>
 <p>
-W aplikacji DFT Visualizer krzywe potencjalne mają <b>kształt
-schematyczny</b> (nie są wyliczane z rzeczywistych częstotliwości
-drgań). Pokazujemy <b>poprawną topologię energetyczną</b> z realnymi
-wartościami liczbowymi, ale szerokość studni i dokładny kształt
-Morse'a są standardowe dla ułatwienia porównań między związkami.
-Aby uzyskać dokładne krzywe trzeba wykonać skanowanie PES i obliczyć
-modes normalne.
+In DFT Visualizer the potential curves have a <b>schematic shape</b>
+(they are NOT computed from actual vibrational frequencies). We show
+the <b>correct energetic topology</b> with real numerical values, but
+the well widths and exact Morse shapes are standardized to make
+comparisons between compounds easier. To obtain accurate PES curves,
+one must perform a PES scan and compute the normal modes.
 </p>
 """
 
 
 # ---------------------------------------------------------------------------
-# Dodatkowa sekcja: o metodach DFT/TD-DFT
+# Section 4: DFT / TD-DFT methods
 # ---------------------------------------------------------------------------
 
 METHODS_HTML = """
-<h2>🔬 O metodach DFT i TD-DFT</h2>
+<h2>🔬 About DFT and TD-DFT methods</h2>
 
-<h3>Skąd biorą się liczby do tej aplikacji?</h3>
+<h3>Where do the numbers come from?</h3>
 <p>
-Dane wprowadzane do DFT Visualizer pochodzą zwykle z obliczeń
-kwantowo-chemicznych w programach takich jak
-<b>Gaussian, ORCA, Q-Chem, Turbomole, NWChem</b>. Typowy workflow:
+Data used in DFT Visualizer typically comes from quantum chemistry
+calculations in packages like <b>Gaussian, ORCA, Q-Chem, Turbomole,
+NWChem</b>. A typical workflow:
 </p>
 <ol>
-  <li><b>Optymalizacja geometrii</b> cząsteczki w stanie S₀
-      (minimum energetyczne).</li>
-  <li><b>Obliczenia częstotliwości drgań</b> — potwierdzenie
-      że to rzeczywiście minimum (brak ujemnych wartości własnych
-      Hessjanu).</li>
-  <li><b>Pojedynczy punkt TD-DFT</b> na zoptymalizowanej geometrii S₀
-      → daje energie S₁ i T₁ <b>wertykalne</b>.</li>
-  <li><b>Osobna optymalizacja S₁ i T₁</b> (tryb TD-DFT opt) →
-      daje energie <b>adiabatyczne</b>.</li>
-  <li>Energie HOMO i LUMO odczytuje się bezpośrednio z
-      obliczeń DFT dla stanu S₀.</li>
+  <li><b>Geometry optimization</b> of the molecule in S₀ (energy
+      minimum).</li>
+  <li><b>Vibrational frequency calculation</b> — confirms that the
+      structure is indeed a minimum (no imaginary frequencies / no
+      negative Hessian eigenvalues).</li>
+  <li><b>TD-DFT single point</b> at the optimized S₀ geometry → yields
+      <b>vertical</b> S₁ and T₁ energies.</li>
+  <li><b>Separate S₁ and T₁ optimization</b> (TD-DFT opt mode) → yields
+      <b>adiabatic</b> energies.</li>
+  <li>HOMO and LUMO energies are read directly from the DFT calculation
+      for the S₀ state.</li>
 </ol>
 
-<h3>Rekomendowane funkcjonały</h3>
+<h3>Recommended functionals</h3>
 <ul>
-  <li><b>B3LYP</b> — klasyczny, dobry do stanów π→π*, słaby dla CT.</li>
-  <li><b>PBE0</b> — podobnie do B3LYP, często lepszy dla związków
-      organicznych.</li>
-  <li><b>CAM-B3LYP</b> — zakresowo-poprawiony, zalecany dla stanów
-      z transferem ładunku.</li>
-  <li><b>ωB97X-D</b> — zakresowo-poprawiony + korekcja dyspersji.
-      "Bezpieczny wybór" dla większości fotoaktywnych cząsteczek.</li>
+  <li><b>B3LYP</b> — classic, good for π→π* states, weaker for CT.</li>
+  <li><b>PBE0</b> — similar to B3LYP, often better for organic molecules.</li>
+  <li><b>CAM-B3LYP</b> — range-separated, recommended for
+      charge-transfer states.</li>
+  <li><b>ωB97X-D</b> — range-separated + dispersion correction.
+      A "safe choice" for most photoactive molecules.</li>
 </ul>
 
-<h3>Bazy funkcyjne</h3>
+<h3>Basis sets</h3>
 <p>
-Dla cząsteczek organicznych zwykle wystarcza
-<b>6-31G(d,p)</b> lub <b>def2-SVP</b>. Dla dokładniejszych energii:
-<b>6-311+G(d,p)</b> lub <b>def2-TZVP</b>. Dla stanów Rydbergowskich
-konieczne są funkcje dyfuzyjne (+).
+For organic molecules <b>6-31G(d,p)</b> or <b>def2-SVP</b> is typically
+sufficient. For more accurate energies: <b>6-311+G(d,p)</b> or
+<b>def2-TZVP</b>. For Rydberg states, diffuse functions (+) are
+required.
 </p>
 
-<h3>Format danych wejściowych</h3>
+<h3>Input data format</h3>
 <p>
-Aplikacja odczytuje plik Excel (.xlsx) z trzema arkuszami:
+The application reads an Excel file (.xlsx) with three sheets:
 </p>
 <ul>
-  <li><b>HOMO_LUMO</b> — kolumny: <i>Compound, HOMO, LUMO</i> (w eV).</li>
-  <li><b>States</b> — kolumny: <i>Compound, S0, T1, S1</i> (w eV).</li>
-  <li><b>FranckCondon</b> — kolumny: <i>Compound, State, E_vertical,
-      E_adiabatic, BDE_value, BDE_label</i> (w kcal/mol).
-      Jedna cząsteczka może mieć wiele wierszy.</li>
+  <li><b>HOMO_LUMO</b> — columns: <i>Compound, HOMO, LUMO</i> (in eV).</li>
+  <li><b>States</b> — columns: <i>Compound, S0, T1, S1</i> (in eV).</li>
+  <li><b>FranckCondon</b> — columns: <i>Compound, State, E_vertical,
+      E_adiabatic, BDE_value, BDE_label</i> (in kcal/mol). One molecule
+      can have multiple rows.</li>
 </ul>
 <p>
-Przykładowy plik <code>sample_compounds.xlsx</code> znajduje się
-w katalogu projektu.
+A sample file <code>sample_compounds.xlsx</code> is provided in the
+project directory.
 </p>
 """
 
 
 # ---------------------------------------------------------------------------
-# Indeks i strona główna
+# Overview / landing page
 # ---------------------------------------------------------------------------
 
 OVERVIEW_HTML = """
-<h1>📚 Teoria diagramów DFT</h1>
+<h1>📚 DFT Diagrams — Theoretical Background</h1>
 
 <p>
-Ta sekcja wyjaśnia <b>znaczenie fizyczne</b> każdego z trzech typów
-diagramów generowanych przez DFT Visualizer oraz koncepcje z
-obliczeń kwantowo-chemicznych stojące za danymi wejściowymi.
+This section explains the <b>physical meaning</b> of each of the three
+diagram types generated by DFT Visualizer, and the quantum-chemistry
+concepts behind the input data.
 </p>
 
 <p>
-Wybierz temat z listy po lewej stronie:
+Select a topic from the list on the left:
 </p>
 
 <ul>
-  <li>🔴 <b>HOMO/LUMO</b> — energie orbitali granicznych,
-      reaktywność chemiczna.</li>
-  <li>🟢 <b>Stany S₀/S₁/T₁</b> — stany elektronowe, absorpcja i
-      przejścia międzysystemowe.</li>
-  <li>🟠 <b>Franck-Condon</b> — powierzchnie energii potencjalnej,
-      przesunięcie Stokesa.</li>
-  <li>🔬 <b>Metody obliczeniowe</b> — DFT, TD-DFT, rekomendacje dla
-      funkcjonałów i baz.</li>
+  <li>🔴 <b>HOMO/LUMO</b> — frontier orbital energies, chemical
+      reactivity.</li>
+  <li>🟢 <b>S₀/S₁/T₁ states</b> — electronic states, absorption, and
+      intersystem crossing.</li>
+  <li>🟠 <b>Franck-Condon</b> — potential energy surfaces, Stokes
+      shift.</li>
+  <li>🔬 <b>Computational methods</b> — DFT, TD-DFT, functional and
+      basis-set recommendations.</li>
 </ul>
 
 <hr>
 
 <p style="color: gray; font-size: small;">
-<i>Ta aplikacja ma charakter wizualizacyjny. Dokładność wyników zależy
-od jakości obliczeń źródłowych. Dla referencji naukowych podawaj zawsze
-użyty funkcjonał i bazę obliczeń.</i>
+<i>This application is a visualization tool. The accuracy of the
+resulting figures depends on the quality of the underlying
+calculations. When citing results, always report the functional and
+basis set used.</i>
 </p>
 """
 
 
 # ---------------------------------------------------------------------------
-# Publiczny API
+# Public API
 # ---------------------------------------------------------------------------
 
 THEORY_SECTIONS: dict[str, tuple[str, str]] = {
-    "overview":      ("📚 Przegląd",                  OVERVIEW_HTML),
+    "overview":      ("📚 Overview",                  OVERVIEW_HTML),
     "homo_lumo":     ("🔴 HOMO / LUMO",              HOMO_LUMO_HTML),
-    "states":        ("🟢 Stany S₀ / S₁ / T₁",       STATES_HTML),
-    "franck_condon": ("🟠 Diagram Franck-Condon",    FRANCK_CONDON_HTML),
-    "methods":       ("🔬 Metody DFT / TD-DFT",      METHODS_HTML),
+    "states":        ("🟢 S₀ / S₁ / T₁ States",      STATES_HTML),
+    "franck_condon": ("🟠 Franck-Condon Diagram",    FRANCK_CONDON_HTML),
+    "methods":       ("🔬 DFT / TD-DFT Methods",     METHODS_HTML),
 }
 """Mapping section_key -> (display_name, html_content).
 

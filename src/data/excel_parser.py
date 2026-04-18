@@ -17,10 +17,7 @@ from src.data.models import (
 
 
 class ExcelParsingError(Exception):
-    """Raised when the Excel file cannot be parsed correctly.
-
-    Messages are provided in both English and Polish separated by ' / '.
-    """
+    """Raised when the Excel file cannot be parsed correctly."""
 
 
 # ---------------------------------------------------------------------------
@@ -57,15 +54,12 @@ def _get_header_map(ws: Worksheet, expected_cols: list[str]) -> dict[str, int]:
         missing = [c for c in expected_cols if c.lower() not in header_map]
         if missing:
             raise ExcelParsingError(
-                f"Missing required columns {missing} in sheet '{ws.title}' / "
-                f"Brakuje wymaganych kolumn {missing} w arkuszu '{ws.title}'"
+                f"Missing required columns {missing} in sheet '{ws.title}'"
             )
         return header_map
     raise ExcelParsingError(
         f"Could not find header row with column '{expected_cols[0]}' "
-        f"in sheet '{ws.title}' / "
-        f"Nie można znaleźć wiersza nagłówkowego z kolumną '{expected_cols[0]}' "
-        f"w arkuszu '{ws.title}'"
+        f"in sheet '{ws.title}'"
     )
 
 
@@ -87,8 +81,7 @@ def _require_float(value: Any, col_name: str, row_num: int) -> float:
         return float(value)  # type: ignore[arg-type]
     except (TypeError, ValueError):
         raise ExcelParsingError(
-            f"Invalid {col_name} value in row {row_num}: {value!r} / "
-            f"Nieprawidłowa wartość {col_name} w wierszu {row_num}: {value!r}"
+            f"Invalid {col_name} value in row {row_num}: {value!r}"
         )
 
 
@@ -203,15 +196,13 @@ def parse_excel(filepath: Path) -> DFTDataset:
         wb = openpyxl.load_workbook(filepath, data_only=True)
     except Exception as exc:
         raise ExcelParsingError(
-            f"Cannot open file '{filepath.name}': {exc} / "
-            f"Nie można otworzyć pliku '{filepath.name}': {exc}"
+            f"Cannot open file '{filepath.name}': {exc}"
         ) from exc
 
     for required in ("HOMO_LUMO", "States"):
         if required not in wb.sheetnames:
             raise ExcelParsingError(
-                f"Missing required sheet '{required}' / "
-                f"Brakuje wymaganego arkusza '{required}'"
+                f"Missing required sheet '{required}'"
             )
 
     homo_lumo = _parse_homo_lumo(wb["HOMO_LUMO"])
