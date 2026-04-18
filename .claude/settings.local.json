@@ -4,7 +4,10 @@
       "Bash(python -c ' *)",
       "Bash(mkdir -p src/gui/diagram_widgets src/data src/plotting src/export tests)",
       "Bash(touch src/__init__.py src/gui/__init__.py src/gui/diagram_widgets/__init__.py src/data/__init__.py src/plotting/__init__.py src/export/__init__.py tests/__init__.py)",
-      "Bash(python -c \"from src.gui.main_window import MainWindow; print\\('imports OK'\\)\")"
+      "Bash(python -c \"from src.gui.main_window import MainWindow; print\\('imports OK'\\)\")",
+      "Bash(conda run -n dft-viz python -c ' *)",
+      "Bash(C:\\\\Users\\\\Ariva\\\\miniconda3\\\\envs\\\\dft-viz\\\\python.exe *)",
+      "Bash(\"/c/Users/Ariva/miniconda3/envs/dft-viz/python.exe\" -m pytest tests/test_parser.py -v)"
     ]
   }
 }

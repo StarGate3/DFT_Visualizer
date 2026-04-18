@@ -12,6 +12,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.gui.data_panel import DataPanel
+
 
 class MainWindow(QMainWindow):
     """Primary window of the DFT Visualizer application.
@@ -90,7 +92,8 @@ class MainWindow(QMainWindow):
 
         import_action = QAction("&Import Excel…", self)
         import_action.setShortcut("Ctrl+I")
-        import_action.triggered.connect(lambda: self._stub("import_excel"))
+        # Connection deferred to _build_dock_widgets once DataPanel is created.
+        self._import_action = import_action
         file_menu.addAction(import_action)
 
         file_menu.addSeparator()
@@ -208,10 +211,16 @@ class MainWindow(QMainWindow):
         # Data dock — left side
         self._data_dock = QDockWidget("Data", self)
         self._data_dock.setAllowedAreas(allowed_areas)
-        data_placeholder = QLabel("Data panel will appear here")
-        data_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._data_dock.setWidget(data_placeholder)
+        self._data_panel = DataPanel(self)
+        self._data_dock.setWidget(self._data_panel)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self._data_dock)
+
+        # Wire up Import Excel menu action now that DataPanel exists.
+        self._import_action.triggered.connect(self._data_panel.load_from_excel)
+
+        # Status bar updates from DataPanel signals.
+        self._data_panel.status_message.connect(self._show_status)
+        self._data_panel.data_changed.connect(self._on_data_changed)
 
         # Style dock — right side
         self._style_dock = QDockWidget("Style & Appearance", self)
@@ -238,6 +247,27 @@ class MainWindow(QMainWindow):
         status_bar = QStatusBar(self)
         self.setStatusBar(status_bar)
         status_bar.showMessage("Ready")
+
+    # ------------------------------------------------------------------
+    # Status bar helpers
+    # ------------------------------------------------------------------
+
+    def _show_status(self, message: str) -> None:
+        """Display *message* on the status bar."""
+        status_bar = self.statusBar()
+        if status_bar is not None:
+            status_bar.showMessage(message)
+
+    def _on_data_changed(self) -> None:
+        """Update status bar with current row counts whenever data is edited."""
+        dataset = self._data_panel.get_dataset()
+        n_hl = len(dataset.homo_lumo)
+        n_st = len(dataset.states)
+        n_fc = len(dataset.franck_condon)
+        self._show_status(
+            f"Data modified \u2014 {n_hl} HOMO/LUMO entries, "
+            f"{n_st} states, {n_fc} FC entries"
+        )
 
     # ------------------------------------------------------------------
     # Stub handler
