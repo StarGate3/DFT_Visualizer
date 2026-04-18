@@ -35,6 +35,7 @@ class AxesStyle(TypedDict):
     spine_linewidth: float
     show_grid: bool
     grid_alpha: float
+    grid_color: str
 
 
 class LineStyle(TypedDict):
@@ -76,7 +77,6 @@ class StateLevelStyle(TypedDict):
     value_fontsize: int
     value_color: str
     value_format: str
-    value_offset_points: int
     label_text: str
     label_fontsize: int
     label_fontweight: str
@@ -162,7 +162,7 @@ class FCAxesStyle(TypedDict):
     xlabel_fontsize: int
 
 
-class DiagramStyle(TypedDict):
+class DiagramStyle(TypedDict, total=False):
     figure: FigureStyle
     title: TitleStyle
     axes: AxesStyle
@@ -184,6 +184,7 @@ class DiagramStyle(TypedDict):
     fc_guide_lines: FCGuideLinesStyle
     fc_isc: FCIscStyle
     fc_axes: FCAxesStyle
+    label_overrides: dict
 
 
 # ---------------------------------------------------------------------------
@@ -213,6 +214,7 @@ DEFAULT_STYLE: DiagramStyle = {
         "spine_linewidth": 1.5,
         "show_grid": True,
         "grid_alpha": 0.3,
+        "grid_color": "#cccccc",
     },
     "homo": {
         "color": "#CC0000",
@@ -250,9 +252,9 @@ DEFAULT_STYLE: DiagramStyle = {
         "fontsize": 9,
         "frameon": True,
     },
-    "s0": {"color": "#1F2E5C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#1F2E5C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#1F2E5C", "label_offset_below": 14},
-    "s1": {"color": "#8B2E3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#8B2E3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#8B2E3C", "label_offset_below": 14},
-    "t1": {"color": "#2E6B3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#2E6B3C", "label_offset_below": 14},
+    "s0": {"color": "#1F2E5C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#1F2E5C", "value_format": "{:.2f} eV", "label_text": "S0", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#1F2E5C", "label_offset_below": 14},
+    "s1": {"color": "#8B2E3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#8B2E3C", "value_format": "{:.2f} eV", "label_text": "S1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#8B2E3C", "label_offset_below": 14},
+    "t1": {"color": "#2E6B3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#2E6B3C", "label_offset_below": 14},
     "absorption_arrow": {"color": "#333333", "linewidth": 1.5, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 9, "label_color": "#333333", "show_label": True, "x_offset": 0.0},
     "isc_curve": {"color": "#555555", "linewidth": 1.2, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 9, "label_color": "#555555", "show_label": True, "curvature": 0.3, "x_offset": 0.0},
     "fc_s0": {"color": "#1F3C7A", "linewidth": 1.8, "label_text": "$S_0$", "label_fontsize": 14, "value_fontsize": 10, "r_eq": 0.0, "k_factor": 1.0},
@@ -263,6 +265,7 @@ DEFAULT_STYLE: DiagramStyle = {
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
     "fc_isc": {"color": "#666666", "linewidth": 1.3, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 10},
     "fc_axes": {"color": "#333333", "linewidth": 1.3, "ylabel_text": "Energy", "ylabel_fontsize": 12, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 11},
+    "label_overrides": {},
 }
 
 PUBLICATION_STYLE: DiagramStyle = {
@@ -288,6 +291,7 @@ PUBLICATION_STYLE: DiagramStyle = {
         "spine_linewidth": 1.0,
         "show_grid": False,
         "grid_alpha": 0.0,
+        "grid_color": "#dddddd",
     },
     "homo": {
         "color": "#CC0000",
@@ -325,9 +329,9 @@ PUBLICATION_STYLE: DiagramStyle = {
         "fontsize": 8,
         "frameon": False,
     },
-    "s0": {"color": "#1F2E5C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#1F2E5C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#1F2E5C", "label_offset_below": 12},
-    "s1": {"color": "#8B2E3C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#8B2E3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#8B2E3C", "label_offset_below": 12},
-    "t1": {"color": "#2E6B3C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#2E6B3C", "label_offset_below": 12},
+    "s0": {"color": "#1F2E5C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#1F2E5C", "value_format": "{:.2f} eV", "label_text": "S0", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#1F2E5C", "label_offset_below": 12},
+    "s1": {"color": "#8B2E3C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#8B2E3C", "value_format": "{:.2f} eV", "label_text": "S1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#8B2E3C", "label_offset_below": 12},
+    "t1": {"color": "#2E6B3C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#2E6B3C", "label_offset_below": 12},
     "absorption_arrow": {"color": "#333333", "linewidth": 1.0, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 8, "label_color": "#333333", "show_label": True, "x_offset": 0.0},
     "isc_curve": {"color": "#555555", "linewidth": 0.75, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 8, "label_color": "#555555", "show_label": True, "curvature": 0.3, "x_offset": 0.0},
     "fc_s0": {"color": "#1F3C7A", "linewidth": 1.2, "label_text": "S0", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.0, "k_factor": 1.0},
@@ -338,6 +342,7 @@ PUBLICATION_STYLE: DiagramStyle = {
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
     "fc_isc": {"color": "#555555", "linewidth": 1.0, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 8},
     "fc_axes": {"color": "#333333", "linewidth": 1.0, "ylabel_text": "Energy", "ylabel_fontsize": 11, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 10},
+    "label_overrides": {},
 }
 
 # Okabe-Ito colorblind-safe palette
@@ -364,6 +369,7 @@ COLORBLIND_STYLE: DiagramStyle = {
         "spine_linewidth": 1.5,
         "show_grid": True,
         "grid_alpha": 0.3,
+        "grid_color": "#bbbbbb",
     },
     "homo": {
         "color": "#D55E00",   # Okabe-Ito vermillion
@@ -401,9 +407,9 @@ COLORBLIND_STYLE: DiagramStyle = {
         "fontsize": 9,
         "frameon": True,
     },
-    "s0": {"color": "#0072B2", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#0072B2", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#0072B2", "label_offset_below": 14},
-    "s1": {"color": "#D55E00", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#D55E00", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#D55E00", "label_offset_below": 14},
-    "t1": {"color": "#009E73", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#009E73", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#009E73", "label_offset_below": 14},
+    "s0": {"color": "#0072B2", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#0072B2", "value_format": "{:.2f} eV", "label_text": "S0", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#0072B2", "label_offset_below": 14},
+    "s1": {"color": "#D55E00", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#D55E00", "value_format": "{:.2f} eV", "label_text": "S1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#D55E00", "label_offset_below": 14},
+    "t1": {"color": "#009E73", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#009E73", "value_format": "{:.2f} eV", "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#009E73", "label_offset_below": 14},
     "absorption_arrow": {"color": "#333333", "linewidth": 1.5, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 9, "label_color": "#333333", "show_label": True, "x_offset": 0.0},
     "isc_curve": {"color": "#555555", "linewidth": 1.2, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 9, "label_color": "#555555", "show_label": True, "curvature": 0.3, "x_offset": 0.0},
     "fc_s0": {"color": "#0072B2", "linewidth": 1.8, "label_text": "S0", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.0, "k_factor": 1.0},
@@ -414,6 +420,7 @@ COLORBLIND_STYLE: DiagramStyle = {
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
     "fc_isc": {"color": "#555555", "linewidth": 1.3, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9},
     "fc_axes": {"color": "#333333", "linewidth": 1.0, "ylabel_text": "Energy", "ylabel_fontsize": 11, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 10},
+    "label_overrides": {},
 }
 
 GRAYSCALE_STYLE: DiagramStyle = {
@@ -439,6 +446,7 @@ GRAYSCALE_STYLE: DiagramStyle = {
         "spine_linewidth": 1.0,
         "show_grid": False,
         "grid_alpha": 0.0,
+        "grid_color": "#999999",
     },
     "homo": {
         "color": "#000000",
@@ -476,9 +484,9 @@ GRAYSCALE_STYLE: DiagramStyle = {
         "fontsize": 8,
         "frameon": False,
     },
-    "s0": {"color": "#000000", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#000000", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S0", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#000000", "label_offset_below": 14},
-    "s1": {"color": "#333333", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#333333", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "S1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#333333", "label_offset_below": 14},
-    "t1": {"color": "#666666", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#666666", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#666666", "label_offset_below": 14},
+    "s0": {"color": "#000000", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#000000", "value_format": "{:.2f} eV", "label_text": "S0", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#000000", "label_offset_below": 14},
+    "s1": {"color": "#333333", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#333333", "value_format": "{:.2f} eV", "label_text": "S1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#333333", "label_offset_below": 14},
+    "t1": {"color": "#666666", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#666666", "value_format": "{:.2f} eV", "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#666666", "label_offset_below": 14},
     "absorption_arrow": {"color": "#000000", "linewidth": 1.0, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 8, "label_color": "#000000", "show_label": True, "x_offset": 0.0},
     "isc_curve": {"color": "#333333", "linewidth": 0.75, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 8, "label_color": "#333333", "show_label": True, "curvature": 0.3, "x_offset": 0.0},
     "fc_s0": {"color": "#000000", "linewidth": 1.5, "label_text": "S0", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.0, "k_factor": 1.0},
@@ -489,6 +497,7 @@ GRAYSCALE_STYLE: DiagramStyle = {
     "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
     "fc_isc": {"color": "#000000", "linewidth": 1.2, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9},
     "fc_axes": {"color": "#333333", "linewidth": 1.0, "ylabel_text": "Energy", "ylabel_fontsize": 11, "xlabel_text": "Reaction coordinate (r)", "xlabel_fontsize": 10},
+    "label_overrides": {},
 }
 
 def _make_publication_high_dpi() -> DiagramStyle:

@@ -78,7 +78,8 @@ def apply_axes_decorations(ax: Axes, style: dict[str, Any]) -> None:
         spine.set_linewidth(axes_s["spine_linewidth"])
 
     if axes_s["show_grid"]:
-        ax.grid(True, axis="y", alpha=axes_s["grid_alpha"], linestyle="--", color="#cccccc")
+        grid_color = axes_s.get("grid_color", "#cccccc")
+        ax.grid(True, axis="y", alpha=axes_s["grid_alpha"], linestyle="--", color=grid_color)
         ax.set_axisbelow(True)
     else:
         ax.grid(False)

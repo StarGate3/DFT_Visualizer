@@ -407,6 +407,14 @@ class MainWindow(QMainWindow):
         if 0 <= tab < self._tab_widget.count():
             self._tab_widget.setCurrentIndex(tab)
 
+        fc_compound = ui_state.get("fc_selected_compound")
+        if fc_compound:
+            self._franck_condon_widget.set_selected_compound(fc_compound)
+
+        fc_unit = ui_state.get("fc_unit")
+        if fc_unit:
+            self._franck_condon_widget.set_selected_unit(fc_unit)
+
     # ------------------------------------------------------------------
     # File menu actions
     # ------------------------------------------------------------------

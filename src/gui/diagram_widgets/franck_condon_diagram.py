@@ -64,6 +64,26 @@ class FranckCondonDiagramWidget(BaseDiagramWidget):
         self._dataset = dataset
         self._style = style
 
+        if not dataset.franck_condon:
+            self._compound_names = []
+            self._compound_combo.blockSignals(True)
+            self._compound_combo.clear()
+            self._compound_combo.blockSignals(False)
+            self.figure.clear()
+            ax = self.figure.add_subplot(111)
+            ax.text(
+                0.5, 0.5, "No Franck-Condon data loaded",
+                ha="center", va="center",
+                transform=ax.transAxes,
+                fontsize=14, color="#888888",
+            )
+            ax.set_axis_off()
+            self.canvas.draw_idle()
+            self._clickable_artists.clear()
+            if self._drag_manager is not None:
+                self._drag_manager.clear()
+            return
+
         # Repopulate compound list if it changed
         names = sorted({e.name for e in dataset.franck_condon})
         if names != self._compound_names:
@@ -86,6 +106,19 @@ class FranckCondonDiagramWidget(BaseDiagramWidget):
         selected = self._compound_combo.currentText()
         unit = self._unit_combo.currentText()
         entries = [e for e in self._dataset.franck_condon if e.name == selected]
+
+        if not entries and selected:
+            self.figure.clear()
+            ax = self.figure.add_subplot(111)
+            ax.text(
+                0.5, 0.5, f"No data for compound: {selected}",
+                ha="center", va="center",
+                transform=ax.transAxes,
+                fontsize=13, color="#888888",
+            )
+            ax.set_axis_off()
+            self.canvas.draw_idle()
+            return
 
         fig_s = self._style.get("figure", {})
         if "figsize" in fig_s:
@@ -179,6 +212,20 @@ class FranckCondonDiagramWidget(BaseDiagramWidget):
 
     def get_selected_unit(self) -> str:
         return self._unit_combo.currentText()
+
+    def set_selected_compound(self, name: str) -> None:
+        idx = self._compound_combo.findText(name)
+        if idx >= 0:
+            self._compound_combo.blockSignals(True)
+            self._compound_combo.setCurrentIndex(idx)
+            self._compound_combo.blockSignals(False)
+
+    def set_selected_unit(self, unit: str) -> None:
+        idx = self._unit_combo.findText(unit)
+        if idx >= 0:
+            self._unit_combo.blockSignals(True)
+            self._unit_combo.setCurrentIndex(idx)
+            self._unit_combo.blockSignals(False)
 
     def _on_control_changed(self, _: object = None) -> None:
         self._draw()

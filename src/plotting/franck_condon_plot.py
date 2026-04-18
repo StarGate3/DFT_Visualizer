@@ -292,7 +292,7 @@ class FranckCondonPlotter:
                 arrowstyle="-|>",
                 color=a_.get("color", "#3A5FCD"),
                 linewidth=a_.get("linewidth", 1.5),
-                linestyle="dashed",
+                linestyle=a_.get("linestyle", "dashed"),
                 mutation_scale=12,
                 zorder=5,
             )

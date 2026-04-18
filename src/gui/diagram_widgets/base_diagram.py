@@ -226,8 +226,8 @@ class BaseDiagramWidget(QWidget):
             self._style.setdefault(section, {})[color_key] = new_hex
         try:
             artist.set_color(new_hex)
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("set_color failed: %s", exc)
         self.canvas.draw_idle()
         if self._style is not None:
             self.style_changed.emit(copy.deepcopy(self._style))
@@ -275,8 +275,8 @@ class BaseDiagramWidget(QWidget):
             self._style.setdefault(section, {})[lw_key] = new_lw
         try:
             artist.set_linewidth(new_lw)
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("set_linewidth failed: %s", exc)
         self.canvas.draw_idle()
         if self._style is not None:
             self.style_changed.emit(copy.deepcopy(self._style))
@@ -289,10 +289,14 @@ class BaseDiagramWidget(QWidget):
         if not ok:
             return
         ls_map = {"solid": "-", "dashed": "--", "dotted": ":", "dashdot": "-."}
+        section = metadata.get("style_section", "")
+        ls_key = metadata.get("style_ls_key", "linestyle")
+        if self._style and section:
+            self._style.setdefault(section, {})[ls_key] = choice
         try:
             artist.set_linestyle(ls_map.get(choice, "-"))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("set_linestyle failed: %s", exc)
         self.canvas.draw_idle()
         if self._style is not None:
             self.style_changed.emit(copy.deepcopy(self._style))
@@ -306,8 +310,8 @@ class BaseDiagramWidget(QWidget):
             self._style.setdefault(section, {})[show_key] = new_val
             try:
                 artist.set_visible(new_val)
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.debug("set_visible failed: %s", exc)
             self.canvas.draw_idle()
             self.style_changed.emit(copy.deepcopy(self._style))
 

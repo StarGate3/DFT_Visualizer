@@ -196,7 +196,7 @@ class HomoLumoPlotter:
             xy=(i, compound.lumo),
             xytext=(i, compound.homo),
             arrowprops=dict(
-                arrowstyle="<->",
+                arrowstyle=gap_s.get("arrow_style", "<->"),
                 color=gap_s["color"],
                 lw=gap_s["linewidth"],
             ),

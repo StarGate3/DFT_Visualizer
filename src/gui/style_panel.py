@@ -386,13 +386,6 @@ class StylePanel(QWidget):
         val_fs_spin.valueChanged.connect(lambda v, lv=level: self._on_state_val_fs_changed(lv, v))
         form.addRow("Value font size:", val_fs_spin)
 
-        offset_spin = QSpinBox()
-        offset_spin.setRange(-30, 30)
-        offset_spin.setSingleStep(1)
-        offset_spin.setSuffix(" pt")
-        offset_spin.valueChanged.connect(lambda v, lv=level: self._on_state_offset_changed(lv, v))
-        form.addRow("Label offset:", offset_spin)
-
         label_text_edit = QLineEdit()
         label_text_edit.textChanged.connect(
             lambda t, lv=level: self._on_state_label_text_changed(lv, t)
@@ -422,7 +415,6 @@ class StylePanel(QWidget):
             "color_btn": color_btn,
             "lw_spin": lw_spin,
             "val_fs_spin": val_fs_spin,
-            "offset_spin": offset_spin,
             "label_text_edit": label_text_edit,
             "label_fs_spin": label_fs_spin,
             "label_offset_below_spin": label_offset_below_spin,
@@ -739,11 +731,10 @@ class StylePanel(QWidget):
         """Update all controls from *style* without emitting signals."""
         self._updating = True
         try:
-            # Preserve label overrides if the incoming style has none
-            old_overrides = self._current_style.get("label_overrides", {})
             self._current_style = copy.deepcopy(style)
-            if "label_overrides" not in style and old_overrides:
-                self._current_style["label_overrides"] = old_overrides
+            # Ensure label_overrides always exists; absent = cleared (preset reset)
+            if "label_overrides" not in self._current_style:
+                self._current_style["label_overrides"] = {}
 
             requested_font = style["title"]["fontfamily"]
             if requested_font not in _PUBLICATION_FONTS or not _is_font_available(requested_font):
@@ -799,7 +790,6 @@ class StylePanel(QWidget):
                 self._set_color_btn(ctrl["color_btn"], level_s.get("color", "#000000"))
                 ctrl["lw_spin"].setValue(level_s.get("linewidth", 2.0))
                 ctrl["val_fs_spin"].setValue(level_s.get("value_fontsize", 9))
-                ctrl["offset_spin"].setValue(level_s.get("value_offset_points", 10))
                 ctrl["label_text_edit"].setText(level_s.get("label_text", level.upper()))
                 ctrl["label_fs_spin"].setValue(level_s.get("label_fontsize", 10))
                 ctrl["label_offset_below_spin"].setValue(level_s.get("label_offset_below", 14))
@@ -1021,12 +1011,6 @@ class StylePanel(QWidget):
         if self._updating:
             return
         self._current_style[level]["value_fontsize"] = value  # type: ignore[index]
-        self._schedule_emit()
-
-    def _on_state_offset_changed(self, level: str, value: int) -> None:
-        if self._updating:
-            return
-        self._current_style[level]["value_offset_points"] = value  # type: ignore[index]
         self._schedule_emit()
 
     def _on_state_label_text_changed(self, level: str, text: str) -> None:
