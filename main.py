@@ -1,6 +1,17 @@
 """Entry point for the DFT Visualizer application."""
 
 import sys
+import warnings
+
+# Suppress a matplotlib shutdown artefact: during figure cleanup on exit,
+# NavigationToolbar can trigger a redraw on a partially-destroyed axes whose
+# x-scale has already been reset to 'log' by the Qt teardown sequence.
+# This has no effect on rendering; suppressing it removes spurious console noise.
+warnings.filterwarnings(
+    "ignore",
+    message="Attempt to set non-positive xlim on a log-scaled axis.*",
+    category=UserWarning,
+)
 
 from PyQt6.QtWidgets import QApplication
 

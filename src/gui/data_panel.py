@@ -142,6 +142,9 @@ class DataPanel(QWidget):
 
     data_changed = pyqtSignal()
     status_message = pyqtSignal(str)
+    # Emitted after a successful Excel import; does NOT trigger the
+    # "Data modified" status message — only triggers a diagram refresh.
+    dataset_loaded = pyqtSignal()
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
@@ -364,7 +367,45 @@ class DataPanel(QWidget):
             return
         if item.column() in (1, 2):
             self._recalculate_gap(item.row())
+            self._validate_homo_lumo_row(item.row())
         self.data_changed.emit()
+
+    def _validate_homo_lumo_row(self, row: int) -> None:
+        """Run validator on a single HOMO/LUMO row and show popup if any issues found.
+
+        Skips the check when the row is incomplete (empty name or non-numeric
+        HOMO/LUMO cells) so new rows don't generate spurious popups.
+        """
+        name_item = self._homo_lumo_table.item(row, 0)
+        homo_item = self._homo_lumo_table.item(row, 1)
+        lumo_item = self._homo_lumo_table.item(row, 2)
+
+        # Require all three fields to have content before validating.
+        if not name_item or not name_item.text().strip():
+            return
+        if not homo_item or not homo_item.text().strip():
+            return
+        if not lumo_item or not lumo_item.text().strip():
+            return
+
+        try:
+            homo = float(homo_item.text())
+            lumo = float(lumo_item.text())
+        except ValueError:
+            return
+
+        compound = CompoundHomoLumo(
+            name=name_item.text().strip(), homo=homo, lumo=lumo
+        )
+        issues = validate_dataset(DFTDataset(homo_lumo=[compound], states=[], franck_condon=[]))
+        if not issues:
+            return
+
+        lines = []
+        for w in issues:
+            tag = "[ERROR]" if w.severity == "error" else "[WARN] "
+            lines.append(f"{tag} {w.message}")
+        QMessageBox.warning(self, "Validation", "\n".join(lines))
 
     def _on_generic_changed(self, item: QTableWidgetItem) -> None:
         if self._loading:
@@ -567,6 +608,7 @@ class DataPanel(QWidget):
         self._tabs.setCurrentIndex(0)
         n = len(dataset.homo_lumo)
         self.status_message.emit(f"Loaded {n} compounds from {path.name}")
+        self.dataset_loaded.emit()
 
     # ------------------------------------------------------------------
     # Toolbar button handlers

@@ -7,7 +7,8 @@
       "Bash(python -c \"from src.gui.main_window import MainWindow; print\\('imports OK'\\)\")",
       "Bash(conda run -n dft-viz python -c ' *)",
       "Bash(C:\\\\Users\\\\Ariva\\\\miniconda3\\\\envs\\\\dft-viz\\\\python.exe *)",
-      "Bash(\"/c/Users/Ariva/miniconda3/envs/dft-viz/python.exe\" -m pytest tests/test_parser.py -v)"
+      "Bash(\"/c/Users/Ariva/miniconda3/envs/dft-viz/python.exe\" -m pytest tests/test_parser.py -v)",
+      "Bash(\"/c/Users/Ariva/miniconda3/envs/dft-viz/python.exe\" -m pytest tests/test_parser.py -q)"
     ]
   }
 }

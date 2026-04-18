@@ -1,5 +1,7 @@
 """Main application window for DFT Visualizer."""
 
+import logging
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction, QFont, QIcon
 from PyQt6.QtWidgets import (
@@ -13,6 +15,10 @@ from PyQt6.QtWidgets import (
 )
 
 from src.gui.data_panel import DataPanel
+from src.gui.diagram_widgets.homo_lumo_diagram import HomoLumoDiagramWidget
+from src.gui.style_panel import StylePanel
+
+logger = logging.getLogger(__name__)
 
 
 class MainWindow(QMainWindow):
@@ -173,19 +179,24 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     def _build_central_widget(self) -> None:
-        """Create the three-tab central diagram area."""
+        """Create the three-tab central diagram area.
+
+        Tab 0 hosts the live HomoLumoDiagramWidget.
+        Tabs 1–2 remain placeholders until Stages 4 and 5.
+        """
         self._tab_widget = QTabWidget(self)
         self.setCentralWidget(self._tab_widget)
 
-        tab_specs: list[tuple[str, str]] = [
-            ("HOMO/LUMO", "HOMO/LUMO diagram will appear here"),
+        self._homo_lumo_widget = HomoLumoDiagramWidget(self)
+        self._tab_widget.addTab(self._homo_lumo_widget, "HOMO/LUMO")
+
+        for tab_title, placeholder_text in [
             ("S0/S1/T1 States", "State diagram will appear here"),
             ("Franck-Condon", "Franck-Condon diagram will appear here"),
-        ]
-
-        for tab_title, placeholder_text in tab_specs:
-            placeholder = self._make_placeholder_label(placeholder_text)
-            self._tab_widget.addTab(placeholder, tab_title)
+        ]:
+            self._tab_widget.addTab(
+                self._make_placeholder_label(placeholder_text), tab_title
+            )
 
     def _make_placeholder_label(self, text: str) -> QLabel:
         """Return a centered, styled placeholder QLabel for an empty tab."""
@@ -225,10 +236,17 @@ class MainWindow(QMainWindow):
         # Style dock — right side
         self._style_dock = QDockWidget("Style & Appearance", self)
         self._style_dock.setAllowedAreas(allowed_areas)
-        style_placeholder = QLabel("Style panel will appear here")
-        style_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._style_dock.setWidget(style_placeholder)
+        self._style_panel = StylePanel(self)
+        self._style_dock.setWidget(self._style_panel)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self._style_dock)
+
+        # Diagram refresh connections
+        self._data_panel.data_changed.connect(self.refresh_active_diagram)
+        self._data_panel.dataset_loaded.connect(self.refresh_active_diagram)
+        self._style_panel.style_changed.connect(self.refresh_active_diagram)
+        self._tab_widget.currentChanged.connect(
+            lambda _: self.refresh_active_diagram()
+        )
 
         # Wire View menu toggles
         self._toggle_data_action.toggled.connect(self._data_dock.setVisible)
@@ -268,6 +286,20 @@ class MainWindow(QMainWindow):
             f"Data modified \u2014 {n_hl} HOMO/LUMO entries, "
             f"{n_st} states, {n_fc} FC entries"
         )
+
+    def refresh_active_diagram(self) -> None:
+        """Re-render whichever diagram tab is currently visible.
+
+        Fetches the current dataset and style, then calls refresh() on the
+        appropriate diagram widget.  Tabs 1 and 2 are placeholders and do
+        nothing until Stages 4 and 5.
+        """
+        dataset = self._data_panel.get_dataset()
+        style = self._style_panel.get_style()
+        idx = self._tab_widget.currentIndex()
+        logger.debug("refresh_active_diagram: tab=%d", idx)
+        if idx == 0:
+            self._homo_lumo_widget.refresh(dataset, style)
 
     # ------------------------------------------------------------------
     # Stub handler
