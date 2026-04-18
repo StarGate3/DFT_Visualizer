@@ -70,7 +70,6 @@ Plik Excel powinien mieć trzy arkusze (tabs):
 | compound_name | HOMO_eV | LUMO_eV |
 |---------------|---------|---------|
 | Benzofenon    | -7.16   | -2.17   |
-| 55-023        | -6.70   | -2.30   |
 
 Gap jest **obliczany automatycznie** jako `LUMO - HOMO`.
 
@@ -78,7 +77,6 @@ Gap jest **obliczany automatycznie** jako `LUMO - HOMO`.
 | compound_name | S0_eV | S1_eV | T1_eV |
 |---------------|-------|-------|-------|
 | PK08-038      | 0.00  | 3.22  | 2.31  |
-| PK05-001      | 0.00  | 2.64  | 2.45  |
 
 ### Arkusz 3: "FranckCondon" (opcjonalnie)
 | compound_name | state | E_vertical | E_adiabatic | BDE_value | BDE_label |
