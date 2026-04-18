@@ -11,3 +11,6 @@ dist/
 .pytest_cache/
 .mypy_cache/
 *.DS_Store
+
+# AI tool configs
+.claude/
