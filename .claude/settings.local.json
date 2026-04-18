@@ -14,7 +14,10 @@
       "Bash(python -m py_compile src/gui/main_window.py)",
       "Bash(python -m py_compile src/gui/style_panel.py)",
       "Bash(python -m py_compile src/gui/diagram_widgets/state_diagram.py)",
-      "Bash(python -m py_compile src/plotting/style_presets.py)"
+      "Bash(python -m py_compile src/plotting/style_presets.py)",
+      "Bash(python -m py_compile src/plotting/plot_helpers.py)",
+      "Bash(python -m py_compile src/plotting/homo_lumo_plot.py)",
+      "Bash(python -m py_compile src/plotting/state_plot.py)"
     ]
   }
 }

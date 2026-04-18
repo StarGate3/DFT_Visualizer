@@ -1,9 +1,39 @@
 """Shared plotting helpers used by multiple diagram plotters."""
 from __future__ import annotations
+import copy
 import logging
 from typing import Any
+from matplotlib import font_manager as _mpl_fm
 from matplotlib.axes import Axes
+
 logger = logging.getLogger(__name__)
+
+_FALLBACK_FONT = "DejaVu Sans"
+
+
+def _is_font_available(name: str) -> bool:
+    try:
+        _mpl_fm.findfont(name, fallback_to_default=False)
+        return True
+    except Exception:
+        return False
+
+
+def validate_style_fonts(style: dict[str, Any]) -> dict[str, Any]:
+    """Return *style* with font fields substituted if the requested font is unavailable.
+
+    Makes a deep copy only when a substitution is needed, so the common
+    (no-substitution) path is allocation-free.
+    """
+    font = style.get("title", {}).get("fontfamily", _FALLBACK_FONT)
+    if _is_font_available(font):
+        return style
+    logger.warning("Font '%s' not available for plot; using %s", font, _FALLBACK_FONT)
+    style = copy.deepcopy(style)
+    style["title"]["fontfamily"] = _FALLBACK_FONT
+    style["axes"]["label_fontfamily"] = _FALLBACK_FONT
+    style["compound_labels"]["fontfamily"] = _FALLBACK_FONT
+    return style
 
 def apply_axes_decorations(ax: Axes, style: dict[str, Any]) -> None:
     """Apply non-data-dependent axis decorations shared by all plotters.

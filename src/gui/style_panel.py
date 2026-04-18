@@ -612,6 +612,12 @@ class StylePanel(QWidget):
     def _on_font_changed(self, family: str) -> None:
         if self._updating:
             return
+        if not _is_font_available(family):
+            logger.warning("Font '%s' not available; keeping %s", family, _FALLBACK_FONT)
+            family = _FALLBACK_FONT
+            self._updating = True
+            self._sync_general_control("font_combo", family, "setCurrentText")
+            self._updating = False
         self._current_style["title"]["fontfamily"] = family
         self._current_style["axes"]["label_fontfamily"] = family
         self._current_style["compound_labels"]["fontfamily"] = family

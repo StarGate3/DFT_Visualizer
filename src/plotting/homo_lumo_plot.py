@@ -10,7 +10,7 @@ from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 
 from src.data.models import CompoundHomoLumo
-from src.plotting.plot_helpers import apply_axes_decorations, apply_x_ticks
+from src.plotting.plot_helpers import apply_axes_decorations, apply_x_ticks, validate_style_fonts
 from src.plotting.style_presets import DEFAULT_STYLE, DiagramStyle
 
 logger = logging.getLogger(__name__)
@@ -59,6 +59,7 @@ class HomoLumoPlotter:
             ``"lumo_lines"``, ``"arrows"``, ``"homo_texts"``,
             ``"lumo_texts"``, ``"gap_texts"``).
         """
+        style = validate_style_fonts(style)
         ax.cla()
         logger.debug("Plotting %d compounds", len(compounds))
 

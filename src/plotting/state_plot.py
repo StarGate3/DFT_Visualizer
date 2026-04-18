@@ -5,7 +5,7 @@ from typing import Any
 from matplotlib.axes import Axes
 from matplotlib.patches import FancyArrowPatch
 from src.data.models import CompoundStates
-from src.plotting.plot_helpers import apply_axes_decorations, apply_x_ticks
+from src.plotting.plot_helpers import apply_axes_decorations, apply_x_ticks, validate_style_fonts
 from src.plotting.style_presets import DEFAULT_STYLE, DiagramStyle
 
 logger = logging.getLogger(__name__)
@@ -40,6 +40,7 @@ class StateDiagramPlotter:
         Returns:
             Dict of artist groups keyed by name.
         """
+        style = validate_style_fonts(style)
         ax.cla()
         logger.debug("StateDiagramPlotter.plot: %d compounds", len(compounds))
 
