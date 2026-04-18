@@ -97,6 +97,7 @@ class StylePanel(QWidget):
         # Storage for control widget references, keyed by scope where needed.
         self._general_controls: dict[str, dict] = {}
         self._state_controls: dict[str, dict] = {}
+        self._fc_curve_controls: dict[str, dict] = {}
 
         self._setup_ui()
         self._init_debounce()
@@ -165,6 +166,12 @@ class StylePanel(QWidget):
     def _build_toolbox_for_franck_condon(self) -> QToolBox:
         tb = QToolBox()
         tb.addItem(self._build_general_page("fc"), "General")
+        tb.addItem(self._build_fc_curve_page("fc_s0", "S0"), "S0 Curve")
+        tb.addItem(self._build_fc_curve_page("fc_s1", "S1"), "S1 Curve")
+        tb.addItem(self._build_fc_curve_page("fc_t1", "T1"), "T1 Curve")
+        tb.addItem(self._build_fc_transitions_page(), "Transitions")
+        tb.addItem(self._build_fc_isc_page(), "ISC")
+        tb.addItem(self._build_fc_guide_lines_page(), "Guide Lines")
         return tb
 
     def _make_page(self) -> tuple[QWidget, QFormLayout]:
@@ -475,6 +482,154 @@ class StylePanel(QWidget):
 
         return w
 
+    # ------------------------------------------------------------------
+    # FC curve pages (one per state: fc_s0, fc_s1, fc_t1)
+    # ------------------------------------------------------------------
+
+    def _build_fc_curve_page(self, level: str, title: str) -> QWidget:
+        w, form = self._make_page()
+        controls: dict = {}
+
+        color_btn = QPushButton(f"{title} color…")
+        color_btn.clicked.connect(lambda checked, lv=level: self._pick_color(lv))
+        form.addRow("", color_btn)
+        controls["color_btn"] = color_btn
+
+        lw_spin = QDoubleSpinBox()
+        lw_spin.setRange(0.5, 5.0)
+        lw_spin.setSingleStep(0.25)
+        lw_spin.setDecimals(2)
+        lw_spin.valueChanged.connect(lambda v, lv=level: self._on_fc_curve_lw_changed(lv, v))
+        form.addRow("Line width:", lw_spin)
+        controls["lw_spin"] = lw_spin
+
+        label_edit = QLineEdit()
+        label_edit.textChanged.connect(
+            lambda t, lv=level: self._on_fc_curve_label_changed(lv, t)
+        )
+        form.addRow("Label text:", label_edit)
+        controls["label_edit"] = label_edit
+
+        label_fs_spin = QSpinBox()
+        label_fs_spin.setRange(6, 18)
+        label_fs_spin.valueChanged.connect(
+            lambda v, lv=level: self._on_fc_curve_label_fs_changed(lv, v)
+        )
+        form.addRow("Label font size:", label_fs_spin)
+        controls["label_fs_spin"] = label_fs_spin
+
+        val_fs_spin = QSpinBox()
+        val_fs_spin.setRange(6, 16)
+        val_fs_spin.valueChanged.connect(
+            lambda v, lv=level: self._on_fc_curve_val_fs_changed(lv, v)
+        )
+        form.addRow("Value font size:", val_fs_spin)
+        controls["val_fs_spin"] = val_fs_spin
+
+        self._fc_curve_controls[level] = controls
+        return w
+
+    def _build_fc_transitions_page(self) -> QWidget:
+        w, form = self._make_page()
+
+        # Vertical (FC) arrow
+        form.addRow(QLabel("<b>Vertical (FC) Arrow</b>"))
+
+        self._fc_vert_color_btn = QPushButton("Color…")
+        self._fc_vert_color_btn.clicked.connect(lambda: self._pick_color("fc_vert"))
+        form.addRow("", self._fc_vert_color_btn)
+
+        self._fc_vert_lw_spin = QDoubleSpinBox()
+        self._fc_vert_lw_spin.setRange(0.25, 5.0)
+        self._fc_vert_lw_spin.setSingleStep(0.25)
+        self._fc_vert_lw_spin.setDecimals(2)
+        self._fc_vert_lw_spin.valueChanged.connect(self._on_fc_vert_lw_changed)
+        form.addRow("Line width:", self._fc_vert_lw_spin)
+
+        self._fc_vert_show_cb = QCheckBox()
+        self._fc_vert_show_cb.stateChanged.connect(self._on_fc_vert_show_changed)
+        form.addRow("Show:", self._fc_vert_show_cb)
+
+        form.addRow(QLabel(""))
+        form.addRow(QLabel("<b>Adiabatic Arrow</b>"))
+
+        self._fc_adib_color_btn = QPushButton("Color…")
+        self._fc_adib_color_btn.clicked.connect(lambda: self._pick_color("fc_adib"))
+        form.addRow("", self._fc_adib_color_btn)
+
+        self._fc_adib_lw_spin = QDoubleSpinBox()
+        self._fc_adib_lw_spin.setRange(0.25, 5.0)
+        self._fc_adib_lw_spin.setSingleStep(0.25)
+        self._fc_adib_lw_spin.setDecimals(2)
+        self._fc_adib_lw_spin.valueChanged.connect(self._on_fc_adib_lw_changed)
+        form.addRow("Line width:", self._fc_adib_lw_spin)
+
+        self._fc_adib_show_cb = QCheckBox()
+        self._fc_adib_show_cb.stateChanged.connect(self._on_fc_adib_show_changed)
+        form.addRow("Show:", self._fc_adib_show_cb)
+
+        return w
+
+    def _build_fc_guide_lines_page(self) -> QWidget:
+        w, form = self._make_page()
+
+        self._fc_guide_color_btn = QPushButton("Color…")
+        self._fc_guide_color_btn.clicked.connect(lambda: self._pick_color("fc_guide"))
+        form.addRow("", self._fc_guide_color_btn)
+
+        self._fc_guide_lw_spin = QDoubleSpinBox()
+        self._fc_guide_lw_spin.setRange(0.1, 3.0)
+        self._fc_guide_lw_spin.setSingleStep(0.1)
+        self._fc_guide_lw_spin.setDecimals(2)
+        self._fc_guide_lw_spin.valueChanged.connect(self._on_fc_guide_lw_changed)
+        form.addRow("Line width:", self._fc_guide_lw_spin)
+
+        self._fc_guide_alpha_spin = QDoubleSpinBox()
+        self._fc_guide_alpha_spin.setRange(0.0, 1.0)
+        self._fc_guide_alpha_spin.setSingleStep(0.05)
+        self._fc_guide_alpha_spin.setDecimals(2)
+        self._fc_guide_alpha_spin.valueChanged.connect(self._on_fc_guide_alpha_changed)
+        form.addRow("Opacity:", self._fc_guide_alpha_spin)
+
+        self._fc_guide_show_cb = QCheckBox()
+        self._fc_guide_show_cb.stateChanged.connect(self._on_fc_guide_show_changed)
+        form.addRow("Show:", self._fc_guide_show_cb)
+
+        return w
+
+    def _build_fc_isc_page(self) -> QWidget:
+        w, form = self._make_page()
+
+        self._fc_isc_color_btn = QPushButton("Color…")
+        self._fc_isc_color_btn.clicked.connect(lambda: self._pick_color("fc_isc"))
+        form.addRow("", self._fc_isc_color_btn)
+
+        self._fc_isc_lw_spin = QDoubleSpinBox()
+        self._fc_isc_lw_spin.setRange(0.25, 5.0)
+        self._fc_isc_lw_spin.setSingleStep(0.25)
+        self._fc_isc_lw_spin.setDecimals(2)
+        self._fc_isc_lw_spin.valueChanged.connect(self._on_fc_isc_lw_changed)
+        form.addRow("Line width:", self._fc_isc_lw_spin)
+
+        self._fc_isc_show_cb = QCheckBox()
+        self._fc_isc_show_cb.stateChanged.connect(self._on_fc_isc_show_changed)
+        form.addRow("Show ISC arrow:", self._fc_isc_show_cb)
+
+        self._fc_isc_show_label_cb = QCheckBox()
+        self._fc_isc_show_label_cb.stateChanged.connect(self._on_fc_isc_show_label_changed)
+        form.addRow("Show label:", self._fc_isc_show_label_cb)
+
+        self._fc_isc_label_edit = QLineEdit()
+        self._fc_isc_label_edit.textChanged.connect(self._on_fc_isc_label_text_changed)
+        form.addRow("Label text:", self._fc_isc_label_edit)
+
+        self._fc_isc_label_fs_spin = QSpinBox()
+        self._fc_isc_label_fs_spin.setRange(6, 16)
+        self._fc_isc_label_fs_spin.valueChanged.connect(self._on_fc_isc_label_fs_changed)
+        form.addRow("Label font size:", self._fc_isc_label_fs_spin)
+
+        return w
+
     def _build_bottom_buttons(self, layout: QVBoxLayout) -> None:
         for label, slot in [
             ("Reset to Default", self._reset_to_default),
@@ -602,6 +757,50 @@ class StylePanel(QWidget):
                 self._isc_label_edit.setText(isc_s.get("label_text", "ISC"))
                 self._isc_label_fs_spin.setValue(isc_s.get("label_fontsize", 9))
                 self._isc_curvature_spin.setValue(isc_s.get("curvature", 0.3))
+
+            # FC curves
+            for fc_level in ("fc_s0", "fc_s1", "fc_t1"):
+                fc_level_s = style.get(fc_level, {})  # type: ignore[call-overload]
+                ctrl = self._fc_curve_controls.get(fc_level, {})
+                if not fc_level_s or not ctrl:
+                    continue
+                self._set_color_btn(ctrl["color_btn"], fc_level_s.get("color", "#333333"))
+                ctrl["lw_spin"].setValue(fc_level_s.get("linewidth", 1.8))
+                ctrl["label_edit"].setText(fc_level_s.get("label_text", fc_level.upper()))
+                ctrl["label_fs_spin"].setValue(fc_level_s.get("label_fontsize", 11))
+                ctrl["val_fs_spin"].setValue(fc_level_s.get("value_fontsize", 9))
+
+            # FC transitions
+            vert_s = style.get("fc_vertical_arrow", {})  # type: ignore[call-overload]
+            if vert_s and hasattr(self, "_fc_vert_show_cb"):
+                self._set_color_btn(self._fc_vert_color_btn, vert_s.get("color", "#1F3C7A"))
+                self._fc_vert_lw_spin.setValue(vert_s.get("linewidth", 1.5))
+                self._fc_vert_show_cb.setChecked(vert_s.get("show", True))
+
+            adib_s = style.get("fc_adiabatic_arrow", {})  # type: ignore[call-overload]
+            if adib_s and hasattr(self, "_fc_adib_show_cb"):
+                self._set_color_btn(self._fc_adib_color_btn, adib_s.get("color", "#1F3C7A"))
+                self._fc_adib_lw_spin.setValue(adib_s.get("linewidth", 1.2))
+                self._fc_adib_show_cb.setChecked(adib_s.get("show", True))
+
+            # FC guide lines
+            guide_s = style.get("fc_guide_lines", {})  # type: ignore[call-overload]
+            if guide_s and hasattr(self, "_fc_guide_show_cb"):
+                self._set_color_btn(self._fc_guide_color_btn, guide_s.get("color", "#888888"))
+                self._fc_guide_lw_spin.setValue(guide_s.get("linewidth", 0.5))
+                self._fc_guide_alpha_spin.setValue(guide_s.get("alpha", 0.6))
+                self._fc_guide_show_cb.setChecked(guide_s.get("show", True))
+
+            # FC ISC
+            isc_fc_s = style.get("fc_isc", {})  # type: ignore[call-overload]
+            if isc_fc_s and hasattr(self, "_fc_isc_show_cb"):
+                self._set_color_btn(self._fc_isc_color_btn, isc_fc_s.get("color", "#666666"))
+                self._fc_isc_lw_spin.setValue(isc_fc_s.get("linewidth", 1.3))
+                self._fc_isc_show_cb.setChecked(isc_fc_s.get("show", True))
+                self._fc_isc_show_label_cb.setChecked(isc_fc_s.get("show_label", True))
+                self._fc_isc_label_edit.setText(isc_fc_s.get("label_text", "ISC"))
+                self._fc_isc_label_fs_spin.setValue(isc_fc_s.get("label_fontsize", 9))
+
         finally:
             self._updating = False
 
@@ -882,6 +1081,62 @@ class StylePanel(QWidget):
             self._schedule_emit()
             return
 
+        if target in ("fc_s0", "fc_s1", "fc_t1"):
+            ctrl = self._fc_curve_controls.get(target, {})
+            current = self._current_style[target]["color"]  # type: ignore[index]
+            color = QColorDialog.getColor(QColor(current), self, "Choose Color")
+            if not color.isValid():
+                return
+            hex_color = color.name()
+            self._current_style[target]["color"] = hex_color  # type: ignore[index]
+            self._set_color_btn(ctrl["color_btn"], hex_color)
+            self._schedule_emit()
+            return
+
+        if target == "fc_vert":
+            current = self._current_style["fc_vertical_arrow"]["color"]
+            color = QColorDialog.getColor(QColor(current), self, "Choose Color")
+            if not color.isValid():
+                return
+            hex_color = color.name()
+            self._current_style["fc_vertical_arrow"]["color"] = hex_color
+            self._set_color_btn(self._fc_vert_color_btn, hex_color)
+            self._schedule_emit()
+            return
+
+        if target == "fc_adib":
+            current = self._current_style["fc_adiabatic_arrow"]["color"]
+            color = QColorDialog.getColor(QColor(current), self, "Choose Color")
+            if not color.isValid():
+                return
+            hex_color = color.name()
+            self._current_style["fc_adiabatic_arrow"]["color"] = hex_color
+            self._set_color_btn(self._fc_adib_color_btn, hex_color)
+            self._schedule_emit()
+            return
+
+        if target == "fc_guide":
+            current = self._current_style["fc_guide_lines"]["color"]
+            color = QColorDialog.getColor(QColor(current), self, "Choose Color")
+            if not color.isValid():
+                return
+            hex_color = color.name()
+            self._current_style["fc_guide_lines"]["color"] = hex_color
+            self._set_color_btn(self._fc_guide_color_btn, hex_color)
+            self._schedule_emit()
+            return
+
+        if target == "fc_isc":
+            current = self._current_style["fc_isc"]["color"]  # type: ignore[index]
+            color = QColorDialog.getColor(QColor(current), self, "Choose Color")
+            if not color.isValid():
+                return
+            hex_color = color.name()
+            self._current_style["fc_isc"]["color"] = hex_color  # type: ignore[index]
+            self._set_color_btn(self._fc_isc_color_btn, hex_color)
+            self._schedule_emit()
+            return
+
         color_map = {
             "homo":  ("homo",      "color",            self._homo_color_btn),
             "lumo":  ("lumo",      "color",            self._lumo_color_btn),
@@ -899,6 +1154,110 @@ class StylePanel(QWidget):
         elif target == "lumo":
             self._current_style["lumo"]["value_color"] = hex_color
         self._set_color_btn(btn, hex_color)
+        self._schedule_emit()
+
+    # FC curve slots
+
+    def _on_fc_curve_lw_changed(self, level: str, value: float) -> None:
+        if self._updating:
+            return
+        self._current_style[level]["linewidth"] = value  # type: ignore[index]
+        self._schedule_emit()
+
+    def _on_fc_curve_label_changed(self, level: str, text: str) -> None:
+        if self._updating:
+            return
+        self._current_style[level]["label_text"] = text  # type: ignore[index]
+        self._schedule_emit()
+
+    def _on_fc_curve_label_fs_changed(self, level: str, value: int) -> None:
+        if self._updating:
+            return
+        self._current_style[level]["label_fontsize"] = value  # type: ignore[index]
+        self._schedule_emit()
+
+    def _on_fc_curve_val_fs_changed(self, level: str, value: int) -> None:
+        if self._updating:
+            return
+        self._current_style[level]["value_fontsize"] = value  # type: ignore[index]
+        self._schedule_emit()
+
+    # FC transition slots
+
+    def _on_fc_vert_lw_changed(self, value: float) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_vertical_arrow"]["linewidth"] = value
+        self._schedule_emit()
+
+    def _on_fc_vert_show_changed(self, _: int) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_vertical_arrow"]["show"] = self._fc_vert_show_cb.isChecked()
+        self._schedule_emit()
+
+    def _on_fc_adib_lw_changed(self, value: float) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_adiabatic_arrow"]["linewidth"] = value
+        self._schedule_emit()
+
+    def _on_fc_adib_show_changed(self, _: int) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_adiabatic_arrow"]["show"] = self._fc_adib_show_cb.isChecked()
+        self._schedule_emit()
+
+    # FC guide line slots
+
+    def _on_fc_guide_lw_changed(self, value: float) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_guide_lines"]["linewidth"] = value
+        self._schedule_emit()
+
+    def _on_fc_guide_alpha_changed(self, value: float) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_guide_lines"]["alpha"] = value
+        self._schedule_emit()
+
+    def _on_fc_guide_show_changed(self, _: int) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_guide_lines"]["show"] = self._fc_guide_show_cb.isChecked()
+        self._schedule_emit()
+
+    # FC ISC slots
+
+    def _on_fc_isc_lw_changed(self, value: float) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_isc"]["linewidth"] = value  # type: ignore[index]
+        self._schedule_emit()
+
+    def _on_fc_isc_show_changed(self, _: int) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_isc"]["show"] = self._fc_isc_show_cb.isChecked()  # type: ignore[index]
+        self._schedule_emit()
+
+    def _on_fc_isc_show_label_changed(self, _: int) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_isc"]["show_label"] = self._fc_isc_show_label_cb.isChecked()  # type: ignore[index]
+        self._schedule_emit()
+
+    def _on_fc_isc_label_text_changed(self, text: str) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_isc"]["label_text"] = text  # type: ignore[index]
+        self._schedule_emit()
+
+    def _on_fc_isc_label_fs_changed(self, value: int) -> None:
+        if self._updating:
+            return
+        self._current_style["fc_isc"]["label_fontsize"] = value  # type: ignore[index]
         self._schedule_emit()
 
     def _set_color_btn(self, btn: QPushButton, hex_color: str) -> None:

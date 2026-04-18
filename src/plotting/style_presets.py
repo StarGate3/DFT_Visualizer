@@ -104,6 +104,58 @@ class IscCurveStyle(TypedDict):
     curvature: float
 
 
+class FCStateStyle(TypedDict):
+    """Style for one FC potential energy curve (S0, S1, or T1)."""
+    color: str
+    linewidth: float
+    label_text: str
+    label_fontsize: int
+    value_fontsize: int
+    r_eq: float
+    k_factor: float
+
+
+class FCArrowStyle(TypedDict):
+    """Style for the vertical Franck-Condon arrow."""
+    color: str
+    linewidth: float
+    arrow_style: str
+    show: bool
+
+
+class FCAdiabArrowStyle(TypedDict):
+    """Style for the dashed adiabatic-transition arrow."""
+    color: str
+    linewidth: float
+    arrow_style: str
+    show: bool
+    linestyle: str
+
+
+class FCGuideLinesStyle(TypedDict):
+    color: str
+    linewidth: float
+    linestyle: str
+    alpha: float
+    show: bool
+
+
+class FCIscStyle(TypedDict):
+    """Style for the ISC curved arrow on the FC diagram."""
+    color: str
+    linewidth: float
+    show: bool
+    show_label: bool
+    label_text: str
+    label_fontsize: int
+
+
+class FCAxesStyle(TypedDict):
+    show_x_axis: bool
+    xlabel: str
+    ylabel_unit: str
+
+
 class DiagramStyle(TypedDict):
     figure: FigureStyle
     title: TitleStyle
@@ -118,6 +170,14 @@ class DiagramStyle(TypedDict):
     t1: StateLevelStyle
     absorption_arrow: AbsorptionArrowStyle
     isc_curve: IscCurveStyle
+    fc_s0: FCStateStyle
+    fc_s1: FCStateStyle
+    fc_t1: FCStateStyle
+    fc_vertical_arrow: FCArrowStyle
+    fc_adiabatic_arrow: FCAdiabArrowStyle
+    fc_guide_lines: FCGuideLinesStyle
+    fc_isc: FCIscStyle
+    fc_axes: FCAxesStyle
 
 
 # ---------------------------------------------------------------------------
@@ -189,6 +249,14 @@ DEFAULT_STYLE: DiagramStyle = {
     "t1": {"color": "#2E6B3C", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#2E6B3C"},
     "absorption_arrow": {"color": "#333333", "linewidth": 1.5, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 9, "label_color": "#333333", "show_label": True},
     "isc_curve": {"color": "#555555", "linewidth": 1.2, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 9, "label_color": "#555555", "show_label": True, "curvature": 0.3},
+    "fc_s0": {"color": "#1F3C7A", "linewidth": 1.8, "label_text": "$S_0$", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.0, "k_factor": 1.0},
+    "fc_s1": {"color": "#3A5FCD", "linewidth": 1.8, "label_text": "$S_1$", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.5, "k_factor": 1.0},
+    "fc_t1": {"color": "#2E8B57", "linewidth": 1.8, "label_text": "$T_1$", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.3, "k_factor": 1.0},
+    "fc_vertical_arrow": {"color": "#3A5FCD", "linewidth": 1.8, "arrow_style": "-|>", "show": True},
+    "fc_adiabatic_arrow": {"color": "#3A5FCD", "linewidth": 1.5, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
+    "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
+    "fc_isc": {"color": "#666666", "linewidth": 1.3, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9},
+    "fc_axes": {"show_x_axis": False, "xlabel": "Reaction Coordinate", "ylabel_unit": "kcal/mol"},
 }
 
 PUBLICATION_STYLE: DiagramStyle = {
@@ -256,6 +324,14 @@ PUBLICATION_STYLE: DiagramStyle = {
     "t1": {"color": "#2E6B3C", "linewidth": 1.0, "value_fontsize": 8, "value_color": "#2E6B3C", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#2E6B3C"},
     "absorption_arrow": {"color": "#333333", "linewidth": 1.0, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 8, "label_color": "#333333", "show_label": True},
     "isc_curve": {"color": "#555555", "linewidth": 0.75, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 8, "label_color": "#555555", "show_label": True, "curvature": 0.3},
+    "fc_s0": {"color": "#1F3C7A", "linewidth": 1.2, "label_text": "S0", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.0, "k_factor": 1.0},
+    "fc_s1": {"color": "#3D71CC", "linewidth": 1.2, "label_text": "S1", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.5, "k_factor": 1.0},
+    "fc_t1": {"color": "#E08A2D", "linewidth": 1.2, "label_text": "T1", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.3, "k_factor": 1.0},
+    "fc_vertical_arrow": {"color": "#1F3C7A", "linewidth": 1.0, "arrow_style": "-|>", "show": True},
+    "fc_adiabatic_arrow": {"color": "#1F3C7A", "linewidth": 1.0, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
+    "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
+    "fc_isc": {"color": "#555555", "linewidth": 1.0, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 8},
+    "fc_axes": {"show_x_axis": False, "xlabel": "Reaction Coordinate", "ylabel_unit": "kcal/mol"},
 }
 
 # Okabe-Ito colorblind-safe palette
@@ -324,6 +400,14 @@ COLORBLIND_STYLE: DiagramStyle = {
     "t1": {"color": "#009E73", "linewidth": 2.5, "value_fontsize": 9, "value_color": "#009E73", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 10, "label_fontweight": "bold", "label_color": "#009E73"},
     "absorption_arrow": {"color": "#333333", "linewidth": 1.5, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 9, "label_color": "#333333", "show_label": True},
     "isc_curve": {"color": "#555555", "linewidth": 1.2, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 9, "label_color": "#555555", "show_label": True, "curvature": 0.3},
+    "fc_s0": {"color": "#0072B2", "linewidth": 1.8, "label_text": "S0", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.0, "k_factor": 1.0},
+    "fc_s1": {"color": "#56B4E9", "linewidth": 1.8, "label_text": "S1", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.5, "k_factor": 1.0},
+    "fc_t1": {"color": "#D55E00", "linewidth": 1.8, "label_text": "T1", "label_fontsize": 11, "value_fontsize": 9, "r_eq": 0.3, "k_factor": 1.0},
+    "fc_vertical_arrow": {"color": "#0072B2", "linewidth": 1.5, "arrow_style": "-|>", "show": True},
+    "fc_adiabatic_arrow": {"color": "#0072B2", "linewidth": 1.2, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
+    "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
+    "fc_isc": {"color": "#555555", "linewidth": 1.3, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9},
+    "fc_axes": {"show_x_axis": False, "xlabel": "Reaction Coordinate", "ylabel_unit": "kcal/mol"},
 }
 
 GRAYSCALE_STYLE: DiagramStyle = {
@@ -391,6 +475,14 @@ GRAYSCALE_STYLE: DiagramStyle = {
     "t1": {"color": "#666666", "linewidth": 2.0, "value_fontsize": 8, "value_color": "#666666", "value_format": "{:.2f} eV", "value_offset_points": 10, "label_text": "T1", "label_fontsize": 9, "label_fontweight": "bold", "label_color": "#666666"},
     "absorption_arrow": {"color": "#000000", "linewidth": 1.0, "arrow_style": "-|>", "label_text": "Abs.", "label_fontsize": 8, "label_color": "#000000", "show_label": True},
     "isc_curve": {"color": "#333333", "linewidth": 0.75, "linestyle": "dashed", "label_text": "ISC", "label_fontsize": 8, "label_color": "#333333", "show_label": True, "curvature": 0.3},
+    "fc_s0": {"color": "#000000", "linewidth": 1.5, "label_text": "S0", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.0, "k_factor": 1.0},
+    "fc_s1": {"color": "#444444", "linewidth": 1.5, "label_text": "S1", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.5, "k_factor": 1.0},
+    "fc_t1": {"color": "#888888", "linewidth": 1.5, "label_text": "T1", "label_fontsize": 10, "value_fontsize": 8, "r_eq": 0.3, "k_factor": 1.0},
+    "fc_vertical_arrow": {"color": "#000000", "linewidth": 1.0, "arrow_style": "-|>", "show": True},
+    "fc_adiabatic_arrow": {"color": "#000000", "linewidth": 1.0, "arrow_style": "-|>", "show": True, "linestyle": "dashed"},
+    "fc_guide_lines": {"color": "#888888", "linewidth": 0.5, "linestyle": "dotted", "alpha": 0.6, "show": True},
+    "fc_isc": {"color": "#000000", "linewidth": 1.2, "show": True, "show_label": True, "label_text": "ISC", "label_fontsize": 9},
+    "fc_axes": {"show_x_axis": False, "xlabel": "Reaction Coordinate", "ylabel_unit": "kcal/mol"},
 }
 
 # ---------------------------------------------------------------------------

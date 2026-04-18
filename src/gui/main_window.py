@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
 )
 
 from src.gui.data_panel import DataPanel
+from src.gui.diagram_widgets.franck_condon_diagram import FranckCondonDiagramWidget
 from src.gui.diagram_widgets.homo_lumo_diagram import HomoLumoDiagramWidget
 from src.gui.diagram_widgets.state_diagram import StateDiagramWidget
 from src.gui.style_panel import StylePanel
@@ -195,10 +196,8 @@ class MainWindow(QMainWindow):
         self._state_diagram_widget = StateDiagramWidget(self)
         self._tab_widget.addTab(self._state_diagram_widget, "S0/S1/T1 States")
 
-        self._tab_widget.addTab(
-            self._make_placeholder_label("Franck-Condon diagram will appear here"),
-            "Franck-Condon",
-        )
+        self._franck_condon_widget = FranckCondonDiagramWidget(self)
+        self._tab_widget.addTab(self._franck_condon_widget, "Franck-Condon")
 
     def _make_placeholder_label(self, text: str) -> QLabel:
         """Return a centered, styled placeholder QLabel for an empty tab."""
@@ -307,6 +306,8 @@ class MainWindow(QMainWindow):
             self._homo_lumo_widget.refresh(dataset, style)
         elif idx == 1:
             self._state_diagram_widget.refresh(dataset, style)
+        elif idx == 2:
+            self._franck_condon_widget.refresh(dataset, style)
 
     # ------------------------------------------------------------------
     # Stub handler

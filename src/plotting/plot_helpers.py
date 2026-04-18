@@ -9,6 +9,18 @@ from matplotlib.axes import Axes
 logger = logging.getLogger(__name__)
 
 _FALLBACK_FONT = "DejaVu Sans"
+KCAL_PER_EV: float = 23.0605
+
+
+def convert_energy(value: float, from_unit: str, to_unit: str) -> float:
+    """Convert energy between 'eV' and 'kcal/mol'."""
+    if from_unit == to_unit:
+        return value
+    if from_unit == "eV" and to_unit == "kcal/mol":
+        return value * KCAL_PER_EV
+    if from_unit == "kcal/mol" and to_unit == "eV":
+        return value / KCAL_PER_EV
+    raise ValueError(f"Unknown unit conversion: {from_unit!r} -> {to_unit!r}")
 
 
 def _is_font_available(name: str) -> bool:
