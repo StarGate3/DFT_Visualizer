@@ -3,12 +3,22 @@ message: "If you use this software, please cite it as below."
 type: software
 title: "DFT Visualizer"
 version: "1.0.2"
-date-released: "2026-04-18"
-authors: 
-  - "Patryk Szymaszek"
-  - alias: "StarGate3"
+date-released: "2026-04-19"
+authors:
+  - family-names: "Szymaszek"
+    given-names: "Patryk"
+    orcid: "https://orcid.org/0000-0002-6421-4476"
+    affiliation: "Faculty of Chemical Engineering and Technology, Department of Biotechnology and Physical Chemistry, Cracow University of Technology"
 repository-code: "https://github.com/StarGate3/DFT_Visualizer"
 license: MIT
+abstract: >
+  DFT Visualizer is a Python/PyQt6 desktop application that converts
+  numerical outputs from Density Functional Theory (DFT) and Time-Dependent
+  DFT (TD-DFT) quantum chemistry calculations into three types of
+  publication-quality diagrams: HOMO/LUMO energy levels, electronic state
+  diagrams (S0/S1/T1), and Franck-Condon schematic diagrams. The
+  application supports interactive label editing, multiple publication
+  presets, and export to PNG, TIFF, SVG, and PDF at up to 1200 DPI.
 keywords:
   - DFT
   - TD-DFT
@@ -17,5 +27,8 @@ keywords:
   - HOMO-LUMO
   - Franck-Condon
   - photochemistry
+  - photophysics
   - visualization
   - scientific software
+  - PyQt6
+  - matplotlib
