@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "DFT Visualizer"
+version: "1.0.2"
+date-released: "2026-04-18"
+authors: 
+  - "Patryk Szymaszek"
+  - alias: "StarGate3"
+repository-code: "https://github.com/StarGate3/DFT_Visualizer"
+license: MIT
+keywords:
+  - DFT
+  - TD-DFT
+  - computational chemistry
+  - molecular orbitals
+  - HOMO-LUMO
+  - Franck-Condon
+  - photochemistry
+  - visualization
+  - scientific software
