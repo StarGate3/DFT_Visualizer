@@ -1,5 +1,9 @@
 # DFT Visualizer
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19651362.svg)](https://doi.org/10.5281/zenodo.19651362)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+
 **Publication-quality visualization tool for Density Functional Theory (DFT) and TD-DFT computational chemistry results.**
 
 A desktop application that converts numerical outputs from quantum chemistry packages (Gaussian, ORCA, Q-Chem, etc.) into three types of publication-ready diagrams:
@@ -228,9 +232,12 @@ This project is released under the **MIT License**. See [LICENSE](LICENSE) for f
 
 ## 👤 Author
 
-**StarGate3**
+**Patryk Szymaszek**  
+ORCID: [0000-0002-6421-4476](https://orcid.org/0000-0002-6421-4476)  
+Faculty of Chemical Engineering and Technology,  
+Department of Biotechnology and Physical Chemistry,  
+Cracow University of Technology  
 GitHub: [@StarGate3](https://github.com/StarGate3)
-Repository: [DFT_Visualizer](https://github.com/StarGate3/DFT_Visualizer)
 
 ---
 
@@ -244,11 +251,32 @@ Repository: [DFT_Visualizer](https://github.com/StarGate3/DFT_Visualizer)
 
 ## 📚 Citation
 
-If this tool contributed to a publication, a citation would be appreciated:
+If this tool contributed to a publication, please cite it as:
 
+**APA format:**
+
+> Szymaszek, P. (2026). *DFT Visualizer* (Version 1.0.2) [Software]. Zenodo. https://doi.org/10.5281/zenodo.19651362
+
+**BibTeX:**
+
+```bibtex
+@software{szymaszek_dft_visualizer_2026,
+  author       = {Szymaszek, Patryk},
+  title        = {{DFT Visualizer}},
+  version      = {1.0.2},
+  date         = {2026-04-19},
+  doi          = {10.5281/zenodo.19651362},
+  url          = {https://doi.org/10.5281/zenodo.19651362},
+  publisher    = {Zenodo},
+  orcid        = {0000-0002-6421-4476}
+}
 ```
-DFT Visualizer. StarGate3, 2026.
-https://github.com/StarGate3/DFT_Visualizer
+
+**ACS Style:**
+
+> Szymaszek, P. DFT Visualizer, v1.0.2, 2026. https://doi.org/10.5281/zenodo.19651362.
+
+Alternatively, use the **"Cite this repository"** button on the [GitHub page](https://github.com/StarGate3/DFT_Visualizer) to automatically generate citations in multiple formats.
 ```
 
 ---

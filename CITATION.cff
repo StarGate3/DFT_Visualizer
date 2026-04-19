@@ -11,6 +11,11 @@ authors:
     affiliation: "Faculty of Chemical Engineering and Technology, Department of Biotechnology and Physical Chemistry, Cracow University of Technology"
 repository-code: "https://github.com/StarGate3/DFT_Visualizer"
 license: MIT
+doi: "10.5281/zenodo.19651362"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.19651362"
+    description: "Zenodo archive DOI for all versions"
 abstract: >
   DFT Visualizer is a Python/PyQt6 desktop application that converts
   numerical outputs from Density Functional Theory (DFT) and Time-Dependent
